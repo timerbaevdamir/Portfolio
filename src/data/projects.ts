@@ -25,7 +25,19 @@ export type Project = {
   /** The project's own deployment — what gets embedded and linked. */
   url: string
   repo?: string
-  /** Which widths are worth showing. The first is the default. */
+  /**
+   * Whether it can be shown running inside this page.
+   *
+   * A live frame is the better showing, but it is the host's decision, not
+   * ours: a production site with real accounts sends `frame-ancestors 'none'`
+   * and is right to. Those are shown as a cover with a link out instead — which
+   * is itself worth knowing about a project, so the page says so rather than
+   * quietly degrading.
+   */
+  embed: boolean
+  /** Optional screenshot for the ones that cannot be embedded. */
+  poster?: string
+  /** Which widths are worth showing. The first is the default. Live only. */
   viewports: Viewport[]
   /** A paragraph for the list; the opening of the case study. */
   summary: string
@@ -42,6 +54,7 @@ export const PROJECTS: Project[] = [
     stack: ["React 19", "TypeScript", "Vite", "Tailwind v4", "Base UI"],
     url: "https://portfolio-mu-black-10.vercel.app/",
     repo: "https://github.com/timerbaevdamir/job-board",
+    embed: true,
     viewports: ["phone", "desktop"],
     summary:
       "Прототип поиска работы, доведённый до состояния, в котором его можно " +
@@ -80,6 +93,55 @@ export const PROJECTS: Project[] = [
           "75 тестов в двух прогонах — чистая логика в node, хуки и стор в " +
           "jsdom. Первый же тест истории нашёл живой баг: hashchange после " +
           "popstate затирал направление, и «назад» анимировалось как «вперёд».",
+      },
+    ],
+  },
+  {
+    slug: "coffee-map",
+    title: "Coffee Map",
+    tagline: "Карта кофеен: шторки, доведённые под iOS, и поиск, который дружит с клавиатурой",
+    year: 2026,
+    stack: ["Next.js", "TypeScript", "Mapbox GL", "Supabase", "Framer Motion"],
+    url: "https://coffeemap.ru/map?city=moscow",
+    embed: false,
+    viewports: ["phone"],
+    summary:
+      "Не прототип, а работающий сервис: карта кофеен по городам, с " +
+      "подборками, событиями и админкой. Интересна в нём мобильная механика — " +
+      "шторки и поиск сделаны так, как это работает в нативном приложении, " +
+      "а не так, как обычно получается в вебе.",
+    notes: [
+      {
+        title: "Шторки, а не модалки",
+        body:
+          "Две разновидности: по высоте контента и во всю высоту, приколотая " +
+          "под статус-бар так, чтобы сверху осталась полоска страницы. " +
+          "Закрываются перетаскиванием — с резинкой на перелёте вверх и " +
+          "длительностью, пропорциональной силе броска, потому что пружина " +
+          "оседает полсекунды и всё это время оверлей ест касания.",
+      },
+      {
+        title: "Фон живёт вместе с пальцем",
+        body:
+          "Страница позади уменьшается, съезжает вниз и скругляется — не по " +
+          "флагу «открыто», а непрерывно, от текущего положения шторки. " +
+          "Тянешь вниз — фон возвращается синхронно. Именно эта связка и " +
+          "делает жест физическим.",
+      },
+      {
+        title: "Поиск и клавиатура iOS",
+        body:
+          "Высота панели поиска считается от visualViewport, а не от " +
+          "layout viewport: iOS не сжимает страницу под клавиатуру, а " +
+          "уезжает под неё вместе с полем ввода, и `100dvh` тут не спасает.",
+      },
+      {
+        title: "Почему здесь нет живого фрейма",
+        body:
+          "Сайт отдаёт `X-Frame-Options: DENY` и `frame-ancestors none`. Для " +
+          "боевого сервиса с реальными аккаунтами это правильная настройка, " +
+          "и обходить её ради красивой обложки в портфолио — плохой размен. " +
+          "Открывается отдельной вкладкой.",
       },
     ],
   },

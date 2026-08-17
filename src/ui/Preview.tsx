@@ -19,7 +19,29 @@ const SIZES: Record<Viewport, { width: number; height: number; label: string }> 
   }
 
 /**
- * A project running inside the page.
+ * A project, shown as well as it can be shown.
+ *
+ * Two bodies rather than one with a flag inside, because they have no state in
+ * common: the live one measures, observes and scales, the cover does none of
+ * that. Which one applies is the host's decision, not a design preference — see
+ * `embed` in the manifest.
+ */
+export function Preview({
+  project,
+  className,
+}: {
+  project: Project
+  className?: string
+}) {
+  return project.embed ? (
+    <LiveFrame project={project} className={className} />
+  ) : (
+    <Cover project={project} className={className} />
+  )
+}
+
+/**
+ * The project running inside the page.
  *
  * It is an `iframe` pointing at the project's own deployment, and it is one on
  * purpose. Importing the project instead would put two applications in one
@@ -32,7 +54,7 @@ const SIZES: Record<Viewport, { width: number; height: number; label: string }> 
  * app inside hears its own media queries fire, and it re-lays-out — which is
  * the demonstration: one deployment, both layouts, live.
  */
-export function Preview({
+function LiveFrame({
   project,
   className,
 }: {
@@ -110,14 +132,7 @@ export function Preview({
           </div>
         )}
 
-        <a
-          href={project.url}
-          target="_blank"
-          rel="noreferrer"
-          className="text-sm leading-5 text-muted transition-colors hover:text-foreground"
-        >
-          Открыть отдельно ↗
-        </a>
+        <OpenLink url={project.url} />
       </div>
 
       <div ref={containerRef} className="w-full">
@@ -148,5 +163,76 @@ export function Preview({
         Живой прототип, а не запись экрана — им можно пользоваться прямо здесь.
       </figcaption>
     </figure>
+  )
+}
+
+/**
+ * The stand-in for a project that refuses to be framed.
+ *
+ * Stated rather than hidden. A reader who notices that one project runs inline
+ * and another does not deserves the reason, and the reason is creditable: a
+ * live service with real accounts sends `frame-ancestors 'none'`, and working
+ * around that to decorate a portfolio would be a poor trade.
+ */
+function Cover({
+  project,
+  className,
+}: {
+  project: Project
+  className?: string
+}) {
+  const host = new URL(project.url).host
+
+  return (
+    <figure className={cn("flex flex-col gap-4", className)}>
+      <div className="flex items-center justify-end">
+        <OpenLink url={project.url} />
+      </div>
+
+      <a
+        href={project.url}
+        target="_blank"
+        rel="noreferrer"
+        className="device group relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-2xl"
+      >
+        {project.poster ? (
+          <>
+            <img
+              src={project.poster}
+              alt=""
+              className="size-full object-cover object-top transition-transform duration-500 ease-soft group-hover:scale-[1.02]"
+            />
+            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-base leading-6 text-foreground">
+              {host} ↗
+            </span>
+          </>
+        ) : (
+          <span className="flex flex-col items-center gap-3 px-8 text-center">
+            <span className="text-sm leading-5 text-faint">{host}</span>
+            <span className="text-xl font-semibold leading-7 tracking-[-0.2px] text-foreground transition-colors group-hover:text-accent">
+              Открыть проект ↗
+            </span>
+          </span>
+        )}
+      </a>
+
+      <figcaption className="text-sm leading-5 text-faint">
+        Боевой сайт: он запрещает встраивание в чужие страницы, поэтому
+        открывается отдельной вкладкой.
+      </figcaption>
+    </figure>
+  )
+}
+
+function OpenLink({ url }: { url: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="text-sm leading-5 text-muted transition-colors hover:text-foreground"
+    >
+      Открыть отдельно ↗
+    </a>
   )
 }

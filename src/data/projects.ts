@@ -41,7 +41,7 @@ export const PROJECTS: Project[] = [
     year: 2026,
     stack: ["React 19", "TypeScript", "Vite", "Tailwind v4", "Base UI"],
     url: "https://portfolio-mu-black-10.vercel.app/",
-    repo: "https://github.com/timerbaevdamir/Portfolio",
+    repo: "https://github.com/timerbaevdamir/job-board",
     viewports: ["phone", "desktop"],
     summary:
       "Прототип поиска работы, доведённый до состояния, в котором его можно " +

@@ -4,8 +4,10 @@ import { Home } from "@/pages/Home"
 import { ProjectPage } from "@/pages/ProjectPage"
 
 /**
- * Shell and routing. The header and footer are the same on every page, so they
- * live here rather than being remembered twice.
+ * Shell and routing.
+ *
+ * The header is a single hairline-ruled row set in the mono — a masthead rather
+ * than navigation, because with two projects there is nothing to navigate.
  */
 export default function App() {
   const route = useRoute()
@@ -13,30 +15,32 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-6 px-6 py-6 sm:px-8">
-        <a
-          href="/"
-          onClick={(e) => {
-            e.preventDefault()
-            navigate({ name: "home" })
-          }}
-          className="text-base font-semibold leading-6 tracking-[-0.1px] text-foreground"
-        >
-          {SITE.name}
-        </a>
-        <nav className="flex items-center gap-5">
-          {SITE.links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm leading-5 text-muted transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+      <header className="border-b border-rule">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault()
+              navigate({ name: "home" })
+            }}
+            className="label text-ink"
+          >
+            {SITE.name}
+          </a>
+          <nav className="flex items-center gap-6">
+            {SITE.links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="label transition-colors hover:text-ink"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
       </header>
 
       <main className="flex-1">
@@ -47,10 +51,11 @@ export default function App() {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-5xl px-6 py-12 sm:px-8">
-        <p className="text-sm leading-5 text-faint">
-          {SITE.name} · {SITE.role} · {new Date().getFullYear()}
-        </p>
+      <footer className="border-t border-rule">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
+          <span className="label">{SITE.role}</span>
+          <span className="label">{new Date().getFullYear()}</span>
+        </div>
       </footer>
     </div>
   )

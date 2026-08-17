@@ -9,7 +9,7 @@ export function ProjectPage({ slug }: { slug: string }) {
   if (!project) {
     return (
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-24 sm:px-8">
-        <h1 className="text-3xl font-semibold leading-9 text-foreground">
+        <h1 className="text-3xl font-semibold leading-9 text-ink">
           Такого проекта нет
         </h1>
         <a
@@ -18,7 +18,7 @@ export function ProjectPage({ slug }: { slug: string }) {
             e.preventDefault()
             navigate({ name: "home" })
           }}
-          className="text-base leading-6 text-accent"
+          className="text-base leading-6 text-ink"
         >
           ← Ко всем проектам
         </a>
@@ -34,28 +34,28 @@ export function ProjectPage({ slug }: { slug: string }) {
           e.preventDefault()
           navigate({ name: "home" })
         }}
-        className="text-sm leading-5 text-muted transition-colors hover:text-foreground"
+        className="text-sm leading-5 text-muted transition-colors hover:text-ink"
       >
         ← Все проекты
       </a>
 
       <header className="flex flex-col gap-5">
-        <h1 className="max-w-3xl text-[40px] font-semibold leading-[1.1] tracking-[-0.8px] text-foreground">
+        <h1 className="max-w-3xl text-[40px] font-semibold leading-[1.1] tracking-[-0.8px] text-ink">
           {project.title}
         </h1>
         <p className="max-w-2xl text-lg leading-7 text-muted">
           {project.summary}
         </p>
-        <dl className="flex flex-wrap gap-x-10 gap-y-4 border-y border-border py-5">
+        <dl className="flex flex-wrap gap-x-10 gap-y-4 border-y border-rule py-5">
           <div className="flex flex-col gap-1">
             <dt className="text-sm leading-5 text-faint">Год</dt>
-            <dd className="text-base leading-6 text-foreground">
+            <dd className="text-base leading-6 text-ink">
               {project.year}
             </dd>
           </div>
           <div className="flex min-w-0 flex-col gap-1">
             <dt className="text-sm leading-5 text-faint">Стек</dt>
-            <dd className="text-base leading-6 text-foreground">
+            <dd className="text-base leading-6 text-ink">
               {project.stack.join(" · ")}
             </dd>
           </div>
@@ -66,7 +66,7 @@ export function ProjectPage({ slug }: { slug: string }) {
                 href={project.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-accent transition-opacity hover:opacity-80"
+                className="text-ink transition-opacity hover:opacity-80"
               >
                 Демо ↗
               </a>
@@ -75,7 +75,7 @@ export function ProjectPage({ slug }: { slug: string }) {
                   href={project.repo}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-accent transition-opacity hover:opacity-80"
+                  className="text-ink transition-opacity hover:opacity-80"
                 >
                   Код ↗
                 </a>
@@ -90,7 +90,7 @@ export function ProjectPage({ slug }: { slug: string }) {
       <section className="flex flex-col gap-10">
         {project.notes.map((note) => (
           <div key={note.title} className="flex max-w-2xl flex-col gap-3">
-            <h2 className="text-xl font-semibold leading-7 tracking-[-0.2px] text-foreground">
+            <h2 className="text-xl font-semibold leading-7 tracking-[-0.2px] text-ink">
               {note.title}
             </h2>
             <p className="text-base leading-7 text-muted">{note.body}</p>

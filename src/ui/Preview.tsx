@@ -111,7 +111,7 @@ function LiveFrame({
           <div
             role="group"
             aria-label="Ширина экрана"
-            className="flex items-center gap-1 rounded-full border border-border bg-surface p-1"
+            className="flex items-center gap-1 rounded-full border border-rule p-1"
           >
             {project.viewports.map((v) => (
               <button
@@ -120,10 +120,8 @@ function LiveFrame({
                 onClick={() => setViewport(v)}
                 aria-pressed={v === viewport}
                 className={cn(
-                  "rounded-full px-3.5 py-1.5 text-sm leading-5 transition-colors",
-                  v === viewport
-                    ? "bg-surface-raised text-foreground"
-                    : "text-muted hover:text-foreground",
+                  "label rounded-full px-3.5 py-1.5 transition-colors",
+                  v === viewport ? "bg-raised text-ink" : "hover:text-ink",
                 )}
               >
                 {SIZES[v].label}
@@ -159,7 +157,7 @@ function LiveFrame({
         </div>
       </div>
 
-      <figcaption className="text-sm leading-5 text-faint">
+      <figcaption className="font-mono text-sm leading-5 text-faint">
         Живой прототип, а не запись экрана — им можно пользоваться прямо здесь.
       </figcaption>
     </figure>
@@ -202,21 +200,21 @@ function Cover({
               alt=""
               className="size-full object-cover object-top transition-transform duration-500 ease-soft group-hover:scale-[1.02]"
             />
-            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-base leading-6 text-foreground">
+            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-base leading-6 text-ink">
               {host} ↗
             </span>
           </>
         ) : (
           <span className="flex flex-col items-center gap-3 px-8 text-center">
-            <span className="text-sm leading-5 text-faint">{host}</span>
-            <span className="text-xl font-semibold leading-7 tracking-[-0.2px] text-foreground transition-colors group-hover:text-accent">
+            <span className="font-mono text-sm leading-5 text-faint">{host}</span>
+            <span className="link font-mono text-lg">
               Открыть проект ↗
             </span>
           </span>
         )}
       </a>
 
-      <figcaption className="text-sm leading-5 text-faint">
+      <figcaption className="font-mono text-sm leading-5 text-faint">
         Боевой сайт: он запрещает встраивание в чужие страницы, поэтому
         открывается отдельной вкладкой.
       </figcaption>
@@ -230,7 +228,7 @@ function OpenLink({ url }: { url: string }) {
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="text-sm leading-5 text-muted transition-colors hover:text-foreground"
+      className="label transition-colors hover:text-ink"
     >
       Открыть отдельно ↗
     </a>

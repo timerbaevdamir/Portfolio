@@ -1,13 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 
-/*
- * Declared once and read by both languages that need them: Tailwind builds its
- * variants from these, and anything measuring the viewport in JS reads the same
- * custom properties. `static` because breakpoints are consumed at build time to
- * generate variants and never through `var()`, so they would otherwise be
- * treated as unused and left out of the stylesheet.
- */
 @theme static {
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
@@ -16,27 +9,34 @@
 }
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /*
+   * IBM Plex, because the subject is engineering precision applied to feel —
+   * someone who argues about how long a sheet should take to close. Plex was
+   * drawn for exactly that world, and the mono is used as the display face
+   * rather than as decoration for code: a spec sheet, set well.
+   *
+   * Not Inter. Inter is the correct choice inside the products shown here and
+   * the reflexive one out here, which is the problem.
+   */
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   /*
-   * Dark on purpose, and it is the one design decision the whole page rests on.
-   * The work being shown is light-themed application UI; on a dark ground each
-   * embed reads as a lit screen rather than as more page. You never have to
-   * wonder where the site ends and the project begins.
+   * One idea holds the whole palette: the only colour on this page is the
+   * work. Everything the site itself draws is ink, paper and one hairline —
+   * so a prototype loading inside a frame is the single saturated thing in
+   * view, and it does not have to compete with a brand.
+   *
+   * The dark is warm and brown-biased rather than the usual cool near-black,
+   * and there is deliberately no accent hue. A lone violet or acid-green pop
+   * on near-black is the house style of every generated portfolio.
    */
-  --color-background: #0a0b0d;
-  --color-surface: #121418;
-  --color-surface-raised: #191c21;
-
-  --color-foreground: #f3f5f7;
-  --color-muted: #98a1ad;
-  --color-faint: #6b7481;
-
-  --color-border: #23272e;
-  --color-border-strong: #333941;
-
-  --color-accent: #a78bfa;
-  --color-accent-soft: #2a2140;
+  --color-ground: #12100e;
+  --color-raised: #1a1815;
+  --color-ink: #f2efe9;
+  --color-muted: #918a80;
+  --color-faint: #6a645c;
+  --color-rule: #2b2723;
 
   --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -55,39 +55,67 @@
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  background-color: var(--color-ground);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
+/* Keyboard focus stays visible, and takes the ink rather than a brand colour. */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
 @layer components {
   /*
-   * The bezel around an embed. Not a skeuomorphic phone — no notch, no buttons,
-   * no rounded chrome pretending to be hardware. Just enough of an edge to say
-   * "this is a screen, and it is not part of the page", which is the only claim
-   * the frame has to make. Anything more dates the work to whichever handset
-   * was current when the frame was drawn.
+   * Small caps set in the mono, used for anything that labels rather than
+   * reads: years, stack lines, section markers. The letter-spacing is what
+   * makes uppercase legible at this size.
    */
-  .device {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border-strong);
-    box-shadow:
-      0 1px 0 rgb(255 255 255 / 0.04) inset,
-      0 24px 64px -24px rgb(0 0 0 / 0.8);
+  .label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
-  /* Scrollbars: present, but not shouting on a dark ground. */
+  /*
+   * A link that reads as one. No accent colour to lean on, so the underline
+   * does the work — offset far enough to clear the descenders, and thickening
+   * on hover rather than changing hue.
+   */
+  .link {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--color-faint);
+    transition: text-decoration-color 150ms var(--ease-soft);
+  }
+  .link:hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  /*
+   * The bezel around an embed. Not a phone drawn in CSS — no notch, no
+   * hardware. Just enough edge to say "this is a screen and it is not part of
+   * the page", which is the only claim the frame has to make.
+   */
+  .device {
+    background-color: var(--color-raised);
+    border: 1px solid var(--color-rule);
+    box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.9);
+  }
+
   .scroll-area {
     scrollbar-width: thin;
-    scrollbar-color: var(--color-border-strong) transparent;
+    scrollbar-color: var(--color-rule) transparent;
     overscroll-behavior: contain;
   }
 }

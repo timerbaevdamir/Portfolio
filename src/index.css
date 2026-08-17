@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+/*
+ * Declared once and read by both languages that need them: Tailwind builds its
+ * variants from these, and anything measuring the viewport in JS reads the same
+ * custom properties. `static` because breakpoints are consumed at build time to
+ * generate variants and never through `var()`, so they would otherwise be
+ * treated as unused and left out of the stylesheet.
+ */
+@theme static {
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+}
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /*
+   * Dark on purpose, and it is the one design decision the whole page rests on.
+   * The work being shown is light-themed application UI; on a dark ground each
+   * embed reads as a lit screen rather than as more page. You never have to
+   * wonder where the site ends and the project begins.
+   */
+  --color-background: #0a0b0d;
+  --color-surface: #121418;
+  --color-surface-raised: #191c21;
+
+  --color-foreground: #f3f5f7;
+  --color-muted: #98a1ad;
+  --color-faint: #6b7481;
+
+  --color-border: #23272e;
+  --color-border-strong: #333941;
+
+  --color-accent: #a78bfa;
+  --color-accent-soft: #2a2140;
+
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@layer components {
+  /*
+   * The bezel around an embed. Not a skeuomorphic phone — no notch, no buttons,
+   * no rounded chrome pretending to be hardware. Just enough of an edge to say
+   * "this is a screen, and it is not part of the page", which is the only claim
+   * the frame has to make. Anything more dates the work to whichever handset
+   * was current when the frame was drawn.
+   */
+  .device {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.04) inset,
+      0 24px 64px -24px rgb(0 0 0 / 0.8);
+  }
+
+  /* Scrollbars: present, but not shouting on a dark ground. */
+  .scroll-area {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+    overscroll-behavior: contain;
+  }
+}

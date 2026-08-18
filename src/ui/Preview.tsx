@@ -178,8 +178,13 @@ function LiveStage({ project }: { project: Project }) {
             title={`${project.title} — живой прототип`}
             onLoad={holdScroll}
             className={cn(
-              "border-0",
-              isPhone && "shrink-0 rounded-xl border border-rule",
+              // Never shrunk by the layout. A flex parent will happily pull a
+              // 1280 frame down to the width it has, and then the transform
+              // shrinks what is already wrong — the app ends up laying out for
+              // the stage's width, which is the very thing the desktop frame
+              // exists to avoid.
+              "shrink-0 border-0",
+              isPhone && "rounded-xl border border-rule",
             )}
             style={{
               width: frame.width,
@@ -189,11 +194,20 @@ function LiveStage({ project }: { project: Project }) {
               // from the corner. A phone is centred, and a centred transform
               // leaves the unscaled footprint behind — the negative margin
               // shrinks the box to what is actually drawn.
+              // A transform draws smaller but still occupies its full size in
+              // the layout, so the box has to be pulled back in by hand or the
+              // stage scrolls to reach space that is not painted. A phone grows
+              // from its centre and gives back on both sides; a desktop grows
+              // from the corner and gives back on two.
               ...(isPhone
                 ? {
                     margin: `${(frame.height * (scale - 1)) / 2}px ${(frame.width * (scale - 1)) / 2}px`,
                   }
-                : { transformOrigin: "top left" }),
+                : {
+                    transformOrigin: "top left",
+                    marginRight: frame.width * (scale - 1),
+                    marginBottom: frame.height * (scale - 1),
+                  }),
             }}
           />
         )}

@@ -12,11 +12,24 @@ import type { Project, Viewport } from "@/data/projects"
  * instead and you get the mobile layout at desktop scale, which demonstrates
  * nothing.
  */
-const SIZES: Record<Viewport, { width: number; height: number; label: string }> =
-  {
-    phone: { width: 390, height: 844, label: "Телефон" },
-    desktop: { width: 1440, height: 900, label: "Десктоп" },
-  }
+const SIZES: Record<
+  Viewport,
+  { label: string; width: number; height: number; fluid?: boolean }
+> = {
+  // A phone is a fixed device: the whole point is a narrow layout shown inside
+  // a page that is not narrow, so 390 is a literal width to simulate.
+  phone: { label: "Телефон", width: 390, height: 844 },
+
+  // A desktop is not simulated — the reader is already on one. `fluid` means
+  // the frame takes whatever width it is given and the app lays out at the
+  // reader's real width, which beats scaling a pretend 1440 down to fit.
+  //
+  // `width` is a floor rather than a size: below it the app stops calling
+  // itself a desktop (its own `xl` breakpoint is 1280), and a frame labelled
+  // "Десктоп" showing the tablet rail would be a lie. Narrower than that, the
+  // frame holds 1280 and scales.
+  desktop: { label: "Десктоп", width: 1280, height: 900, fluid: true },
+}
 
 /**
  * A project, shown as well as it can be shown.
@@ -205,11 +218,13 @@ function LiveFrame({
   // phone is the tab bar. Proportions survive scaling; a missing tab bar does
   // not. Still never scaled *up*: past 1:1 the type would be a lie in the other
   // direction, and on a tall screen the frame simply stops at its true size.
+  // Fluid viewports grow into the space; fixed ones keep their device width.
+  const logical = size.fluid ? Math.max(available, size.width) : size.width
   const scale =
     available > 0 && headroom > 0
-      ? Math.min(1, available / size.width, headroom / size.height)
+      ? Math.min(1, available / logical, headroom / size.height)
       : 0
-  const shown = { width: size.width * scale, height: size.height * scale }
+  const shown = { width: logical * scale, height: size.height * scale }
 
   return (
     <figure className={cn("flex flex-col gap-3", className)}>
@@ -242,7 +257,7 @@ function LiveFrame({
                 // Sized in the app's own coordinates and then scaled down as a
                 // whole, so the app never learns it is being shown small.
                 style={{
-                  width: size.width,
+                  width: logical,
                   height: size.height,
                   transform: `scale(${scale})`,
                   transformOrigin: "top left",

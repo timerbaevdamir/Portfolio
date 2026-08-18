@@ -133,6 +133,20 @@ export function ProjectPage({ slug }: { slug: string }) {
             <span className="label shrink-0">{project.year}</span>
           </div>
           <p className="text-sm leading-6 text-muted">{project.summary}</p>
+
+          {/* The engagement in facts. A reader checks these first and reads
+              them once, so they are a table rather than a sentence. */}
+          {project.facts && (
+            <dl className="flex flex-col gap-2 pt-1">
+              {project.facts.map((fact) => (
+                <div key={fact.label} className="flex gap-4">
+                  <dt className="label w-24 shrink-0">{fact.label}</dt>
+                  <dd className="text-sm leading-5 text-ink">{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
           <p className="label">{project.stack.join(" / ")}</p>
           {project.repo && (
             <a
@@ -145,6 +159,24 @@ export function ProjectPage({ slug }: { slug: string }) {
             </a>
           )}
         </header>
+
+        {project.goals && (
+          <section className="flex flex-col gap-3 border-b border-rule p-6">
+            <h2 className="label">Задачи</h2>
+            {/* Numbered, because a brief is a list of separate commitments and
+                a reader counts them. Bullets would blur where one ends. */}
+            <ol className="flex flex-col gap-2">
+              {project.goals.map((goal, i) => (
+                <li key={goal} className="flex gap-3 text-sm leading-6 text-muted">
+                  <span className="label shrink-0 pt-0.5 text-faint">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {goal}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
 
         <div className="flex flex-col">
           {project.notes.map((note) => (

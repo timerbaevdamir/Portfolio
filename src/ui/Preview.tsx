@@ -67,24 +67,30 @@ export function Preview({
  */
 function Window({
   url,
+  width,
   controls,
   children,
 }: {
   url: string
+  /** The window is the device: it hugs the frame rather than framing it. */
+  width?: number | string
   controls?: ReactNode
   children: ReactNode
 }) {
   const host = new URL(url).host
 
   return (
-    <div className="overflow-hidden rounded-xl border border-rule bg-raised shadow-[0_40px_80px_-40px_rgb(0_0_0/0.9)]">
+    <div
+      className="@container mx-auto overflow-hidden rounded-xl border border-rule bg-raised shadow-[0_40px_80px_-40px_rgb(0_0_0/0.9)] transition-[width] duration-300 ease-soft"
+      style={{ width: width ?? "100%" }}
+    >
       <div className="flex items-center gap-3 border-b border-rule px-3 py-2.5">
         <div className="flex min-w-0 shrink-0 items-center gap-1">{controls}</div>
 
         {/* The address, quiet and centred — read, not typed. Hidden on a narrow
             screen, where the three groups cannot share one row and the link on
             the right already carries the destination. */}
-        <span className="label hidden flex-1 justify-center truncate rounded-full bg-ground px-3 py-1 text-center sm:flex">
+        <span className="label hidden flex-1 justify-center truncate rounded-full bg-ground px-3 py-1 text-center @min-[560px]:flex">
           {host}
         </span>
 
@@ -92,7 +98,7 @@ function Window({
           href={url}
           target="_blank"
           rel="noreferrer"
-          className="label ml-auto shrink-0 transition-colors hover:text-ink sm:ml-0"
+          className="label ml-auto shrink-0 transition-colors hover:text-ink @min-[560px]:ml-0"
         >
           Открыть ↗
         </a>
@@ -227,9 +233,10 @@ function LiveFrame({
   const shown = { width: logical * scale, height: size.height * scale }
 
   return (
-    <figure className={cn("flex flex-col gap-3", className)}>
+    <figure ref={containerRef} className={cn("flex flex-col gap-3", className)}>
       <Window
         url={project.url}
+        width={shown.width || undefined}
         controls={
           project.viewports.length > 1 ? (
             <ViewportSwitch
@@ -242,13 +249,13 @@ function LiveFrame({
           )
         }
       >
-        {/* The window keeps its width; only the frame inside changes, the way a
-            device mode narrows the page without moving the browser. */}
-        <div ref={containerRef} className="w-full">
-          <div
-            className="mx-auto overflow-hidden transition-[width,height] duration-300 ease-soft"
-            style={{ width: shown.width || "100%", height: shown.height || 480 }}
-          >
+        {/* The window is the device, so it narrows with it. A 390px frame
+            floating in a 1780px window read as a mistake rather than as a
+            phone: the dead ground either side was wider than the device. */}
+        <div
+          className="overflow-hidden transition-[height] duration-300 ease-soft"
+          style={{ height: shown.height || 480 }}
+        >
             {started && scale > 0 && (
               <iframe
                 src={project.url}
@@ -264,8 +271,7 @@ function LiveFrame({
                   border: 0,
                 }}
               />
-            )}
-          </div>
+          )}
         </div>
       </Window>
 

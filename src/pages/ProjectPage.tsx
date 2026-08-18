@@ -1,3 +1,5 @@
+import { useState } from "react"
+import { cn } from "@/lib/cn"
 import { PROJECTS, findProject } from "@/data/projects"
 import { Preview } from "@/ui/Preview"
 import { useNavigate } from "@/lib/router"
@@ -16,6 +18,9 @@ import { useNavigate } from "@/lib/router"
  */
 export function ProjectPage({ slug }: { slug: string }) {
   const navigate = useNavigate()
+  // Kept across projects on purpose: a reader who has put the notes away is
+  // there to look at the work, and moving to the next one does not change that.
+  const [notes, setNotes] = useState(true)
   const project = findProject(slug)
   const index = PROJECTS.findIndex((p) => p.slug === slug)
 
@@ -61,6 +66,36 @@ export function ProjectPage({ slug }: { slug: string }) {
         >
           ✕
         </a>
+
+        {/* Only offered where the column exists. Below `lg` there is no room
+            for it and nothing to collapse. */}
+        <button
+          type="button"
+          onClick={() => setNotes((open) => !open)}
+          aria-pressed={notes}
+          aria-label={notes ? "Скрыть описание" : "Показать описание"}
+          className={cn(
+            "hidden size-9 items-center justify-center rounded-lg transition-colors hover:bg-raised lg:flex",
+            notes ? "text-ink" : "text-muted hover:text-ink",
+          )}
+        >
+          <svg viewBox="0 0 16 16" fill="none" className="size-4">
+            <rect
+              x="1.75"
+              y="2.75"
+              width="12.5"
+              height="10.5"
+              rx="2"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            />
+            <path
+              d="M6.25 3v10"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            />
+          </svg>
+        </button>
 
         <div className="mt-auto flex flex-col items-center gap-1">
           <button

@@ -173,7 +173,6 @@ function LiveFrame({
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [available, setAvailable] = useState(0)
-  const [headroom, setHeadroom] = useState(0)
 
   // Nothing is loaded until the reader is looking at it. With one project that
   // is a nicety; by the fourth it is the difference between a page that opens
@@ -189,13 +188,6 @@ function LiveFrame({
     })
     ro.observe(el)
 
-    // How much height the reader's screen can spare. The 220 is the title bar,
-    // the caption under it, and enough page left over that the window reads as
-    // sitting on a page rather than as being one. The floor keeps a very short
-    // window from collapsing the frame to a sliver.
-    const measure = () => setHeadroom(Math.max(360, window.innerHeight - 220))
-    measure()
-    window.addEventListener("resize", measure)
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -210,26 +202,24 @@ function LiveFrame({
     return () => {
       ro.disconnect()
       io.disconnect()
-      window.removeEventListener("resize", measure)
     }
   }, [])
 
-  // Constrained on both axes, and the height is the one that actually bites.
-  // A phone is 844 tall against a column wide enough to leave it unscaled, so
-  // fitting width alone handed it its full height and it filled a laptop screen
-  // end to end.
+  // Scaled down only when the frame genuinely does not fit the column, which
+  // for a phone is never.
   //
-  // Fitting the height shrinks a phone below life size, which is a distortion —
-  // but the alternative is cropping, and what gets cropped off the bottom of a
-  // phone is the tab bar. Proportions survive scaling; a missing tab bar does
-  // not. Still never scaled *up*: past 1:1 the type would be a lie in the other
-  // direction, and on a tall screen the frame simply stops at its true size.
-  // Fluid viewports grow into the space; fixed ones keep their device width.
+  // It used to be scaled to fit the viewport height as well, and that had to
+  // go: a CSS transform on the iframe breaks how the browser rasterises
+  // `position: fixed` content inside it. The app's sheets measured and
+  // hit-tested correctly at full height and simply painted short — the reason
+  // the search sheet lost its bottom half in the frame while the filter sheet,
+  // being content-height, did not. Browser zoom shifted the raster and made it
+  // look fixed, which is what gave the cause away.
+  //
+  // So a phone is shown at 1:1 and the block is tall. A tall phone-shaped card
+  // is a phone; a phone with its bottom missing is a broken embed.
   const logical = size.fluid ? Math.max(available, size.width) : size.width
-  const scale =
-    available > 0 && headroom > 0
-      ? Math.min(1, available / logical, headroom / size.height)
-      : 0
+  const scale = available > 0 ? Math.min(1, available / logical) : 0
   const shown = { width: logical * scale, height: size.height * scale }
 
   return (

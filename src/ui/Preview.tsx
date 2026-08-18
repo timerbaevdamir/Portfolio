@@ -128,17 +128,20 @@ function LiveStage({ project }: { project: Project }) {
 
   const spec = SIZES[viewport]
 
-  // The phone is rendered at its true 390x844 and shown smaller.
+  // The phone is rendered at its true 390x844 and fitted to the stage.
   //
-  // That means a CSS transform, which earlier looked like the cause of a sheet
-  // painting only part of the way down. On a harness at this scale it is not:
-  // `fixed` and `absolute` render identically and both fill the frame. So the
-  // trade is taken — real device dimensions, which is what decides the app's
-  // layout — with the note that if a sheet ever clips again, this is the first
-  // thing to suspect and resizing is the way back.
+  // Capped at 1, never above: a phone shown larger than life would be a lie
+  // about the size of its type, which on a phone is most of the design. On a
+  // stage tall enough it therefore stops at its real size and the room left
+  // over stays empty — which is the correct amount of room to leave.
+  //
+  // Fitting by transform means a CSS scale, which earlier looked like the cause
+  // of a sheet painting only part of the way down. It is not: a harness showed
+  // `fixed` and `absolute` rendering identically, and the sheets survive here.
+  // If one ever clips again, this is the first thing to suspect.
   const scale =
     viewport === "phone" && box.h > 0 && box.w > 0
-      ? Math.min(1, (box.h * 0.75) / spec.height, box.w / spec.width)
+      ? Math.min(1, box.h / spec.height, box.w / spec.width)
       : 1
 
   const frame =

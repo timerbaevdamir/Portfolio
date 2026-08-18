@@ -128,7 +128,12 @@ export function ProjectPage({ slug }: { slug: string }) {
 
       {/* The work itself. */}
       <main className="min-w-0 flex-1">
-        <Preview project={project} />
+        {/* Keyed by the project, so moving between them starts the stage over.
+            Without it React keeps the instance — same type, same position — and
+            the chosen viewport survives into a project that may not have it: a
+            desktop-only project inherited the phone width from the one before
+            and had no switch to escape it, because it only has one. */}
+        <Preview key={project.slug} project={project} />
       </main>
     </div>
   )

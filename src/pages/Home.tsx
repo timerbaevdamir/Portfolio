@@ -147,12 +147,9 @@ export function Home() {
                   {/* Tight to the title: a tagline is the second line of a
                       name, not a paragraph after it. */}
                   <div className="flex flex-col gap-1">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <h2 className="font-mono text-lg font-medium tracking-[-0.02em] text-ink">
-                        {project.title}
-                      </h2>
-                      <span className="label shrink-0">{project.year}</span>
-                    </div>
+                    <h2 className="font-mono text-lg font-medium tracking-[-0.02em] text-ink">
+                      {project.title}
+                    </h2>
                     <p className="text-sm leading-6 text-muted">
                       {project.tagline}
                     </p>

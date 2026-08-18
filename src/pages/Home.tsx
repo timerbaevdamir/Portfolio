@@ -33,11 +33,28 @@ export function Home() {
       >
         <div className="flex flex-col gap-8">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-4">
+              {SITE.avatar && (
+                <img
+                  src={SITE.avatar}
+                  alt={SITE.name}
+                  width={64}
+                  height={64}
+                  // Cropped to the circle rather than squeezed into it, and
+                  // ringed: on a dark ground a photograph without an edge
+                  // bleeds into the column.
+                  className="size-16 rounded-full object-cover ring-1 ring-rule"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none"
+                  }}
+                />
+              )}
+              <div className="flex flex-col gap-1">
               <span className="font-mono text-base font-medium tracking-[-0.01em] text-ink">
                 {SITE.name}
               </span>
-              <span className="label">{SITE.role}</span>
+                <span className="label">{SITE.role}</span>
+              </div>
             </div>
             <button
               type="button"

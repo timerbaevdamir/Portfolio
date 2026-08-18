@@ -7,6 +7,15 @@
  */
 export const SITE = {
   name: "Дамир Тимербаев",
+  /**
+   * Portrait for the left column. A path under `public/`, so the file ships
+   * with the deploy and is versioned beside the page that shows it.
+   *
+   * Until the file exists the image removes itself rather than leaving a broken
+   * icon — a portfolio missing its author's face should look like a portfolio
+   * without a face, not like a page that failed.
+   */
+  avatar: "/avatar.jpg",
   role: "Продуктовый дизайнер",
   /** The one claim the shelf makes. Short on purpose. */
   headline: "Это не скриншоты.",

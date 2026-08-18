@@ -50,9 +50,9 @@ export function Home() {
                 />
               )}
               <div className="flex flex-col gap-1">
-              <span className="font-mono text-base font-medium tracking-[-0.01em] text-ink">
-                {SITE.name}
-              </span>
+                <span className="font-mono text-base font-medium tracking-[-0.01em] text-ink">
+                  {SITE.name}
+                </span>
                 <span className="label">{SITE.role}</span>
               </div>
             </div>
@@ -122,11 +122,15 @@ export function Home() {
         </div>
 
         <div className="mx-auto w-full max-w-4xl px-6 pb-24 lg:px-10">
-          <section className="flex flex-col gap-6 py-16 lg:py-20">
-            <h1 className="max-w-2xl font-mono text-[clamp(2.25rem,5vw,3.5rem)] font-medium leading-[1.06] tracking-[-0.04em] text-ink [text-wrap:balance]">
+          {/* A heading over the work, not a hero above it. The column on the
+              left already says whose work this is, and the tiles say better
+              than a sentence can what the work is — so this stays a label and
+              gives the room back. */}
+          <section className="flex flex-col gap-3 py-12 lg:py-16">
+            <h1 className="font-mono text-2xl font-medium tracking-[-0.02em] text-ink">
               {SITE.headline}
             </h1>
-            <p className="max-w-[62ch] text-base leading-7 text-muted">
+            <p className="max-w-[60ch] text-base leading-7 text-muted">
               {SITE.intro}
             </p>
           </section>

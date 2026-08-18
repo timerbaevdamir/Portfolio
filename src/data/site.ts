@@ -17,13 +17,12 @@ export const SITE = {
    */
   avatar: "/avatar.jpg",
   role: "Продуктовый дизайнер",
-  /** The one claim the shelf makes. Short on purpose. */
-  headline: "Это не скриншоты.",
+  /** The heading over the work. A label, not a pitch. */
+  headline: "Проекты",
+  /** What the reader can do here, said once and without argument. */
   intro:
-    "Прототипы ниже — не записи экрана и не картинки. Каждый развёрнут " +
-    "отдельно и запущен прямо на этой странице: можно ввести запрос, " +
-    "применить фильтр, переключить ширину и посмотреть, как интерфейс " +
-    "перестраивается под телефон.",
+    "Каждый запущен прямо на этой странице: можно набрать запрос, применить " +
+    "фильтр, переключить ширину. Разбор решений — на странице проекта.",
   /** Two or three sentences in the left column. Not a CV. */
   about:
     "Проектирую интерфейсы и довожу их до работающих прототипов — так " +

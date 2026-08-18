@@ -128,10 +128,24 @@ function LiveStage({ project }: { project: Project }) {
   }, [])
 
   const spec = SIZES[viewport]
-  // A phone keeps its own dimensions; a desktop takes the stage's.
+  // A phone keeps its width and takes its height from the stage — it is made
+  // shorter rather than scaled down.
+  //
+  // Scaling is what a fit normally means, and it is exactly what cannot happen
+  // here: a transform on the frame breaks how the browser rasterises
+  // `position: fixed` inside it, and this app is mostly sheets. Resizing has
+  // none of that problem, and it is not a compromise — 390x700 is a real phone
+  // viewport, and the app lays out for it honestly. Phones differ in height
+  // anyway; an SE is 375x667.
+  //
+  // Bounded at both ends: short enough to still be a phone rather than a strip,
+  // tall enough to stop before it becomes a shape no phone has.
   const frame =
     viewport === "phone"
-      ? { width: spec.width, height: spec.height }
+      ? {
+          width: spec.width,
+          height: box.h > 0 ? Math.max(480, Math.min(box.h, 932)) : spec.height,
+        }
       : { width: box.w, height: box.h }
 
   return (
@@ -153,7 +167,7 @@ function LiveStage({ project }: { project: Project }) {
         ref={boxRef}
         className={cn(
           "flex h-full min-h-full w-full",
-          viewport === "phone" ? "justify-center p-6" : "",
+          viewport === "phone" ? "items-center justify-center p-6" : "",
         )}
       >
         {visible && frame.width > 0 && (

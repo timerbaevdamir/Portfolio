@@ -53,7 +53,12 @@ export function Thumb({ project, className }: { project: Project; className?: st
     <div
       ref={ref}
       className={cn(
-        "relative overflow-hidden border-b border-rule bg-ground",
+        // Rounded and edged here rather than by a card around it: the picture
+        // is the only part that needs a boundary, and it now has to draw its
+        // own. `isolate` gives the radius a stacking context to clip against —
+        // the frame inside is composited, and a plain overflow clip has never
+        // been reliable over that.
+        "relative isolate overflow-hidden rounded-xl border border-rule bg-ground transition-colors",
         className,
       )}
       style={{ height: height || 220 }}

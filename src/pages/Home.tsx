@@ -132,7 +132,7 @@ export function Home() {
             </p>
           </section>
 
-          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2">
             {PROJECTS.map((project) => (
               <li key={project.slug}>
                 <a
@@ -141,10 +141,12 @@ export function Home() {
                     e.preventDefault()
                     navigate({ name: "project", slug: project.slug })
                   }}
-                  className="group flex h-full flex-col overflow-hidden rounded-xl border border-rule bg-raised transition-colors hover:border-muted"
+                  className="group flex flex-col gap-4"
                 >
-                  <Thumb project={project} />
-                  <div className="flex flex-1 flex-col gap-3 p-5">
+                  <Thumb project={project} className="group-hover:border-muted" />
+                  {/* Tight to the title: a tagline is the second line of a
+                      name, not a paragraph after it. */}
+                  <div className="flex flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-4">
                       <h2 className="font-mono text-lg font-medium tracking-[-0.02em] text-ink">
                         {project.title}

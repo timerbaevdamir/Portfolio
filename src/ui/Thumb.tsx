@@ -35,12 +35,19 @@ export function Thumb({ project, className }: { project: Project; className?: st
     return () => ro.disconnect()
   }, [])
 
-  // Landscape tiles, so a desktop layout fills one and a phone stands in the
-  // middle of it. Which of the two a project gets is what it actually has.
-  const portrait = !project.viewports.includes("desktop")
-  const size = portrait ? LOGICAL.phone : LOGICAL.desktop
+  // A phone wherever a project has one: on a shelf the tiles are read at a
+  // glance, and a device standing on a dark ground is recognisable at a size
+  // where a desktop layout has already become a grey texture. A project with no
+  // phone view falls back to the desktop rather than being shown a width it
+  // does not have.
+  //
+  // The tile stays landscape either way. Letting the aspect follow the content
+  // would make the grid ragged, and a set that does not line up stops reading
+  // as a set.
+  const showsPhone = project.viewports.includes("phone")
+  const size = showsPhone ? LOGICAL.phone : LOGICAL.desktop
   const height = width * 0.625
-  const scale = portrait ? height / size.h : width / size.w
+  const scale = showsPhone ? height / size.h : width / size.w
 
   return (
     <div

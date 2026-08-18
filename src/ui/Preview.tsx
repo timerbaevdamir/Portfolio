@@ -127,28 +127,23 @@ function LiveStage({ project }: { project: Project }) {
   }, [])
 
   const spec = SIZES[viewport]
-  // A phone is resized to fit the stage, never scaled. Scaling is what a fit
-  // normally means and it is the one thing that cannot happen here: a transform
-  // on the frame breaks how the browser rasterises `position: fixed` inside it,
-  // and this app is mostly sheets.
+
+  // The phone is rendered at its true 390x844 and shown smaller.
   //
-  // Resizing keeps the iPhone proportion exactly, which costs width — at a
-  // laptop's stage height the frame comes out around 320 rather than 390. That
-  // is the trade a fixed aspect makes: the shape is right and the width is
-  // narrower than the device it is shaped after. The floor is the narrowest
-  // viewport anyone designs for; below it the stage scrolls instead.
+  // That means a CSS transform, which earlier looked like the cause of a sheet
+  // painting only part of the way down. On a harness at this scale it is not:
+  // `fixed` and `absolute` render identically and both fill the frame. So the
+  // trade is taken — real device dimensions, which is what decides the app's
+  // layout — with the note that if a sheet ever clips again, this is the first
+  // thing to suspect and resizing is the way back.
+  const scale =
+    viewport === "phone" && box.h > 0 && box.w > 0
+      ? Math.min(1, (box.h * 0.75) / spec.height, box.w / spec.width)
+      : 1
+
   const frame =
     viewport === "phone"
-      ? (() => {
-          // Three quarters of the stage, so the device sits in the space
-          // rather than filling it edge to edge.
-          const fitted = Math.max(
-            480,
-            Math.min((box.h || spec.height) * 0.75, 932),
-          )
-          const width = Math.max(320, Math.round(fitted * (spec.width / spec.height)))
-          return { width, height: Math.round(width * (spec.height / spec.width)) }
-        })()
+      ? { width: spec.width, height: spec.height }
       : { width: box.w, height: box.h }
 
   return (
@@ -182,7 +177,16 @@ function LiveStage({ project }: { project: Project }) {
               "border-0",
               viewport === "phone" && "shrink-0 rounded-xl border border-rule",
             )}
-            style={{ width: frame.width, height: frame.height }}
+            style={{
+              width: frame.width,
+              height: frame.height,
+              ...(viewport === "phone" && {
+                transform: `scale(${scale})`,
+                // Centred by the flex parent, so the box it occupies has to
+                // shrink with it rather than keeping its unscaled footprint.
+                margin: `${(frame.height * (scale - 1)) / 2}px ${(frame.width * (scale - 1)) / 2}px`,
+              }),
+            }}
           />
         )}
       </div>

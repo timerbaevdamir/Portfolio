@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import { cn } from "@/lib/cn"
 import type { Project, Viewport } from "@/data/projects"
 
@@ -37,6 +37,92 @@ export function Preview({
     <LiveFrame project={project} className={className} />
   ) : (
     <Cover project={project} className={className} />
+  )
+}
+
+/**
+ * The chrome around an embed: a window, the way a preview pane in an editor is
+ * a window.
+ *
+ * The controls used to float above the frame, unattached — a row of buttons
+ * that happened to sit near a rectangle. Giving them a title bar makes them
+ * belong to the thing they operate, and the bar earns its place by carrying the
+ * address: seeing a real hostname is what says this is a deployment and not a
+ * mockup, which is the claim the whole site rests on.
+ *
+ * Three groups, left to right: what to show, where it is, and how to leave.
+ */
+function Window({
+  url,
+  controls,
+  children,
+}: {
+  url: string
+  controls?: ReactNode
+  children: ReactNode
+}) {
+  const host = new URL(url).host
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-rule bg-raised shadow-[0_40px_80px_-40px_rgb(0_0_0/0.9)]">
+      <div className="flex items-center gap-3 border-b border-rule px-3 py-2.5">
+        <div className="flex min-w-0 shrink-0 items-center gap-1">{controls}</div>
+
+        {/* The address, quiet and centred — read, not typed. Hidden on a narrow
+            screen, where the three groups cannot share one row and the link on
+            the right already carries the destination. */}
+        <span className="label hidden flex-1 justify-center truncate rounded-full bg-ground px-3 py-1 text-center sm:flex">
+          {host}
+        </span>
+
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="label ml-auto shrink-0 transition-colors hover:text-ink sm:ml-0"
+        >
+          Открыть ↗
+        </a>
+      </div>
+
+      {/* Darkest surface of the three, so a phone-width frame reads as floating
+          in the window rather than as the window itself. */}
+      <div className="bg-ground">{children}</div>
+    </div>
+  )
+}
+
+/** The segmented control, matching the label treatment the rest of the meta uses. */
+function ViewportSwitch({
+  viewports,
+  value,
+  onChange,
+}: {
+  viewports: Viewport[]
+  value: Viewport
+  onChange: (v: Viewport) => void
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Ширина экрана"
+      className="flex items-center gap-0.5 rounded-full bg-ground p-0.5"
+    >
+      {viewports.map((v) => (
+        <button
+          key={v}
+          type="button"
+          onClick={() => onChange(v)}
+          aria-pressed={v === value}
+          className={cn(
+            "label rounded-full px-3 py-1 transition-colors",
+            v === value ? "bg-raised text-ink" : "hover:text-ink",
+          )}
+        >
+          {SIZES[v].label}
+        </button>
+      ))}
+    </div>
   )
 }
 
@@ -105,57 +191,47 @@ function LiveFrame({
   const shown = { width: size.width * scale, height: size.height * scale }
 
   return (
-    <figure className={cn("flex flex-col gap-4", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {project.viewports.length > 1 && (
-          <div
-            role="group"
-            aria-label="Ширина экрана"
-            className="flex items-center gap-1 rounded-full border border-rule p-1"
-          >
-            {project.viewports.map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setViewport(v)}
-                aria-pressed={v === viewport}
-                className={cn(
-                  "label rounded-full px-3.5 py-1.5 transition-colors",
-                  v === viewport ? "bg-raised text-ink" : "hover:text-ink",
-                )}
-              >
-                {SIZES[v].label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <OpenLink url={project.url} />
-      </div>
-
-      <div ref={containerRef} className="w-full">
-        <div
-          className="device mx-auto overflow-hidden rounded-2xl transition-[width,height] duration-300 ease-soft"
-          style={{ width: shown.width || "100%", height: shown.height || 480 }}
-        >
-          {started && scale > 0 && (
-            <iframe
-              src={project.url}
-              title={`${project.title} — живой прототип`}
-              loading="lazy"
-              // The frame is sized in the app's own coordinates and then scaled
-              // down as a whole, so the app never learns it is being shown small.
-              style={{
-                width: size.width,
-                height: size.height,
-                transform: `scale(${scale})`,
-                transformOrigin: "top left",
-                border: 0,
-              }}
+    <figure className={cn("flex flex-col gap-3", className)}>
+      <Window
+        url={project.url}
+        controls={
+          project.viewports.length > 1 ? (
+            <ViewportSwitch
+              viewports={project.viewports}
+              value={viewport}
+              onChange={setViewport}
             />
-          )}
+          ) : (
+            <span className="label px-1">Живой прототип</span>
+          )
+        }
+      >
+        {/* The window keeps its width; only the frame inside changes, the way a
+            device mode narrows the page without moving the browser. */}
+        <div ref={containerRef} className="w-full">
+          <div
+            className="mx-auto overflow-hidden transition-[width,height] duration-300 ease-soft"
+            style={{ width: shown.width || "100%", height: shown.height || 480 }}
+          >
+            {started && scale > 0 && (
+              <iframe
+                src={project.url}
+                title={`${project.title} — живой прототип`}
+                loading="lazy"
+                // Sized in the app's own coordinates and then scaled down as a
+                // whole, so the app never learns it is being shown small.
+                style={{
+                  width: size.width,
+                  height: size.height,
+                  transform: `scale(${scale})`,
+                  transformOrigin: "top left",
+                  border: 0,
+                }}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      </Window>
 
       <figcaption className="font-mono text-sm leading-5 text-faint">
         Живой прототип, а не запись экрана — им можно пользоваться прямо здесь.
@@ -167,10 +243,11 @@ function LiveFrame({
 /**
  * The stand-in for a project that refuses to be framed.
  *
- * Stated rather than hidden. A reader who notices that one project runs inline
- * and another does not deserves the reason, and the reason is creditable: a
- * live service with real accounts sends `frame-ancestors 'none'`, and working
- * around that to decorate a portfolio would be a poor trade.
+ * Same window, empty of a page. Stated rather than hidden: a reader who notices
+ * that one project runs inline and another does not deserves the reason, and
+ * the reason is creditable — a live service with real accounts sends
+ * `frame-ancestors 'none'`, and working around that to decorate a portfolio
+ * would be a poor trade.
  */
 function Cover({
   project,
@@ -179,58 +256,33 @@ function Cover({
   project: Project
   className?: string
 }) {
-  const host = new URL(project.url).host
-
   return (
-    <figure className={cn("flex flex-col gap-4", className)}>
-      <div className="flex items-center justify-end">
-        <OpenLink url={project.url} />
-      </div>
-
-      <a
-        href={project.url}
-        target="_blank"
-        rel="noreferrer"
-        className="device group relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-2xl"
+    <figure className={cn("flex flex-col gap-3", className)}>
+      <Window
+        url={project.url}
+        controls={<span className="label px-1">Боевой сайт</span>}
       >
-        {project.poster ? (
-          <>
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noreferrer"
+          className="group flex aspect-[16/10] items-center justify-center overflow-hidden"
+        >
+          {project.poster ? (
             <img
               src={project.poster}
               alt=""
               className="size-full object-cover object-top transition-transform duration-500 ease-soft group-hover:scale-[1.02]"
             />
-            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-base leading-6 text-ink">
-              {host} ↗
-            </span>
-          </>
-        ) : (
-          <span className="flex flex-col items-center gap-3 px-8 text-center">
-            <span className="font-mono text-sm leading-5 text-faint">{host}</span>
-            <span className="link font-mono text-lg">
-              Открыть проект ↗
-            </span>
-          </span>
-        )}
-      </a>
+          ) : (
+            <span className="link font-mono text-lg">Открыть проект ↗</span>
+          )}
+        </a>
+      </Window>
 
       <figcaption className="font-mono text-sm leading-5 text-faint">
-        Боевой сайт: он запрещает встраивание в чужие страницы, поэтому
-        открывается отдельной вкладкой.
+        Запрещает встраивание в чужие страницы — открывается отдельной вкладкой.
       </figcaption>
     </figure>
-  )
-}
-
-function OpenLink({ url }: { url: string }) {
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noreferrer"
-      className="label transition-colors hover:text-ink"
-    >
-      Открыть отдельно ↗
-    </a>
   )
 }

@@ -102,17 +102,6 @@ body {
     text-decoration-color: var(--color-ink);
   }
 
-  /*
-   * The bezel around an embed. Not a phone drawn in CSS — no notch, no
-   * hardware. Just enough edge to say "this is a screen and it is not part of
-   * the page", which is the only claim the frame has to make.
-   */
-  .device {
-    background-color: var(--color-raised);
-    border: 1px solid var(--color-rule);
-    box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.9);
-  }
-
   .scroll-area {
     scrollbar-width: thin;
     scrollbar-color: var(--color-rule) transparent;

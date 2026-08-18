@@ -26,17 +26,19 @@ export type Project = {
   url: string
   repo?: string
   /**
-   * Whether it can be shown running inside this page.
+   * Shown running inside this page, or shown as a cover.
    *
-   * A live frame is the better showing, but it is the host's decision, not
-   * ours: a production site with real accounts sends `frame-ancestors 'none'`
-   * and is right to. Those are shown as a cover with a link out instead — which
-   * is itself worth knowing about a project, so the page says so rather than
-   * quietly degrading.
+   * `true` embeds it. Anything else is the line the cover prints instead — so
+   * a project that is not embedded says something true about itself, rather
+   * than borrowing one generic excuse written for a different project. The two
+   * cannot be set at once, which is the point of one field rather than two.
+   *
+   * A live frame is the better showing, but it is not always ours to give:
+   * a production site may forbid framing, or depend on a service this page
+   * cannot vouch for. Flipping this back to `true` restores the frame and
+   * everything set up for it.
    */
-  embed: boolean
-  /** Optional screenshot for the ones that cannot be embedded. */
-  poster?: string
+  embed: true | string
   /** Which widths are worth showing. The first is the default. Live only. */
   viewports: Viewport[]
   /** A paragraph for the list; the opening of the case study. */
@@ -161,7 +163,11 @@ export const PROJECTS: Project[] = [
     year: 2026,
     stack: ["Next.js", "TypeScript", "Mapbox GL", "Supabase", "Framer Motion"],
     url: "https://coffeemap.ru/map?city=moscow",
-    embed: true,
+    // Not framed: the map is served by a live backend whose data call fails
+    // intermittently, and a case study that shows an error screen a third of
+    // the time argues against itself. The viewports below are kept — they cost
+    // nothing unread, and the day the frame comes back it comes back whole.
+    embed: "Живой сервис — открывается на своём домене",
     // Phone first: the case is about how it feels in the hand, and that is the
     // view the notes describe. The desktop layout is a different arrangement
     // rather than the same one widened — a rail, a column of coffee shops and

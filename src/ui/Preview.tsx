@@ -26,7 +26,11 @@ const SIZES: Record<Viewport, { label: string; width: number; height: number }> 
  * embed.
  */
 export function Preview({ project }: { project: Project }) {
-  return project.embed ? <LiveStage project={project} /> : <Cover project={project} />
+  return project.embed === true ? (
+    <LiveStage project={project} />
+  ) : (
+    <Cover project={project} note={project.embed} />
+  )
 }
 
 /**
@@ -221,13 +225,13 @@ function LiveStage({ project }: { project: Project }) {
 }
 
 /**
- * The stand-in for a project that refuses to be framed.
+ * The stand-in for a project shown by link rather than in a frame.
  *
- * Stated rather than hidden: a live service with real accounts sends
- * `frame-ancestors 'none'`, and working around that to decorate a portfolio
- * would be a poor trade.
+ * The reason comes from the project itself and is printed, not hidden. One
+ * sentence about why a door is a door costs less than a reader deciding on
+ * their own that the embed broke.
  */
-function Cover({ project }: { project: Project }) {
+function Cover({ project, note }: { project: Project; note: string }) {
   return (
     <Window
       url={project.url}
@@ -239,7 +243,7 @@ function Cover({ project }: { project: Project }) {
         rel="noreferrer"
         className="flex h-full min-h-full flex-col items-center justify-center gap-3 px-8 text-center"
       >
-        <span className="label">Запрещает встраивание в чужие страницы</span>
+        <span className="label">{note}</span>
         <span className="link font-mono text-lg">Открыть проект ↗</span>
       </a>
     </Window>

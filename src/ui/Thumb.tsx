@@ -63,7 +63,7 @@ export function Thumb({ project, className }: { project: Project; className?: st
       )}
       style={{ height: height || 220 }}
     >
-      {project.embed && visible && scale > 0 ? (
+      {project.embed === true && visible && scale > 0 ? (
         <iframe
           src={project.url}
           title=""

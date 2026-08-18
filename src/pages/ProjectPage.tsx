@@ -124,7 +124,14 @@ export function ProjectPage({ slug }: { slug: string }) {
 
       {/* The prose column. Where the tool keeps its conversation, this keeps
           the account of what was decided and why. */}
-      <aside className="scroll-area hidden w-[400px] shrink-0 flex-col overflow-y-auto border-r border-rule lg:flex">
+      <aside
+        className={cn(
+          "scroll-area w-[400px] shrink-0 flex-col overflow-y-auto border-r border-rule",
+          // Chosen, not overridden: `cn` joins without merging, so `lg:flex`
+          // and `lg:hidden` on one element would be settled by stylesheet order.
+          notes ? "hidden lg:flex" : "hidden",
+        )}
+      >
         <header className="flex flex-col gap-4 border-b border-rule p-6">
           <div className="flex items-baseline justify-between gap-4">
             <h1 className="font-mono text-2xl font-medium tracking-[-0.02em] text-ink">

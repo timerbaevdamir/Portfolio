@@ -84,22 +84,19 @@ export function Home() {
           )}
         </div>
 
-        <div className="flex flex-col gap-4">
-          <nav className="flex flex-col gap-2">
-            {SITE.links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                className="link font-mono text-sm"
-              >
-                {link.label} ↗
-              </a>
-            ))}
-          </nav>
-          <span className="label text-faint">{new Date().getFullYear()}</span>
-        </div>
+        <nav className="flex flex-col gap-2">
+          {SITE.links.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              className="link font-mono text-sm"
+            >
+              {link.label} ↗
+            </a>
+          ))}
+        </nav>
       </aside>
 
       <main

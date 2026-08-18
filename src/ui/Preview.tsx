@@ -154,6 +154,7 @@ function LiveFrame({
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [available, setAvailable] = useState(0)
+  const [headroom, setHeadroom] = useState(0)
 
   // Nothing is loaded until the reader is looking at it. With one project that
   // is a nicety; by the fourth it is the difference between a page that opens
@@ -169,6 +170,14 @@ function LiveFrame({
     })
     ro.observe(el)
 
+    // How much height the reader's screen can spare. The 220 is the title bar,
+    // the caption under it, and enough page left over that the window reads as
+    // sitting on a page rather than as being one. The floor keeps a very short
+    // window from collapsing the frame to a sliver.
+    const measure = () => setHeadroom(Math.max(360, window.innerHeight - 220))
+    measure()
+    window.addEventListener("resize", measure)
+
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) setStarted(true)
@@ -182,12 +191,24 @@ function LiveFrame({
     return () => {
       ro.disconnect()
       io.disconnect()
+      window.removeEventListener("resize", measure)
     }
   }, [])
 
-  // Never scaled up: a phone shown larger than life is a lie about the size of
-  // its type, which on a phone is most of the design.
-  const scale = available > 0 ? Math.min(1, available / size.width) : 0
+  // Constrained on both axes, and the height is the one that actually bites.
+  // A phone is 844 tall against a column wide enough to leave it unscaled, so
+  // fitting width alone handed it its full height and it filled a laptop screen
+  // end to end.
+  //
+  // Fitting the height shrinks a phone below life size, which is a distortion —
+  // but the alternative is cropping, and what gets cropped off the bottom of a
+  // phone is the tab bar. Proportions survive scaling; a missing tab bar does
+  // not. Still never scaled *up*: past 1:1 the type would be a lie in the other
+  // direction, and on a tall screen the frame simply stops at its true size.
+  const scale =
+    available > 0 && headroom > 0
+      ? Math.min(1, available / size.width, headroom / size.height)
+      : 0
   const shown = { width: size.width * scale, height: size.height * scale }
 
   return (

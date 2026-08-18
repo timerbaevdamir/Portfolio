@@ -6,8 +6,7 @@ import type { Project, Viewport } from "@/data/projects"
 
 const SIZES: Record<Viewport, { label: string; width: number; height: number }> =
   {
-    // A phone is a fixed device: the point is a narrow layout inside a page
-    // that is not narrow, so 390 is a literal width.
+    // iPhone 14/15 — 390x844, the logical size most phones in use report.
     phone: { label: "Телефон", width: 390, height: 844 },
     // A desktop is not simulated — the stage is already one. It takes the room
     // it is given and the app lays out at the reader's real width.
@@ -128,24 +127,23 @@ function LiveStage({ project }: { project: Project }) {
   }, [])
 
   const spec = SIZES[viewport]
-  // A phone keeps its width and takes its height from the stage — it is made
-  // shorter rather than scaled down.
+  // A phone is resized to fit the stage, never scaled. Scaling is what a fit
+  // normally means and it is the one thing that cannot happen here: a transform
+  // on the frame breaks how the browser rasterises `position: fixed` inside it,
+  // and this app is mostly sheets.
   //
-  // Scaling is what a fit normally means, and it is exactly what cannot happen
-  // here: a transform on the frame breaks how the browser rasterises
-  // `position: fixed` inside it, and this app is mostly sheets. Resizing has
-  // none of that problem, and it is not a compromise — 390x700 is a real phone
-  // viewport, and the app lays out for it honestly. Phones differ in height
-  // anyway; an SE is 375x667.
-  //
-  // Bounded at both ends: short enough to still be a phone rather than a strip,
-  // tall enough to stop before it becomes a shape no phone has.
+  // Resizing keeps the iPhone proportion exactly, which costs width — at a
+  // laptop's stage height the frame comes out around 320 rather than 390. That
+  // is the trade a fixed aspect makes: the shape is right and the width is
+  // narrower than the device it is shaped after. The floor is the narrowest
+  // viewport anyone designs for; below it the stage scrolls instead.
   const frame =
     viewport === "phone"
-      ? {
-          width: spec.width,
-          height: box.h > 0 ? Math.max(480, Math.min(box.h, 932)) : spec.height,
-        }
+      ? (() => {
+          const fitted = Math.max(480, Math.min(box.h || spec.height, 932))
+          const width = Math.max(320, Math.round(fitted * (spec.width / spec.height)))
+          return { width, height: Math.round(width * (spec.height / spec.width)) }
+        })()
       : { width: box.w, height: box.h }
 
   return (

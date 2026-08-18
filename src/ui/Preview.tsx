@@ -1,95 +1,56 @@
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { cn } from "@/lib/cn"
+import { useInView } from "@/lib/useInView"
+import { holdScroll } from "@/lib/holdScroll"
 import type { Project, Viewport } from "@/data/projects"
 
-/**
- * The logical size each viewport is rendered at — the width the embedded app
- * believes it has, not the space it is given on this page.
- *
- * That distinction is the whole trick. The frame renders at a real device width
- * and is then scaled to fit the column, so a 1440px layout can be shown inside
- * an 800px page without the app ever being told it is small. Squeeze the iframe
- * instead and you get the mobile layout at desktop scale, which demonstrates
- * nothing.
- */
-const SIZES: Record<
-  Viewport,
-  { label: string; width: number; height: number; fluid?: boolean }
-> = {
-  // A phone is a fixed device: the whole point is a narrow layout shown inside
-  // a page that is not narrow, so 390 is a literal width to simulate.
-  phone: { label: "Телефон", width: 390, height: 844 },
+const SIZES: Record<Viewport, { label: string; width: number; height: number }> =
+  {
+    // A phone is a fixed device: the point is a narrow layout inside a page
+    // that is not narrow, so 390 is a literal width.
+    phone: { label: "Телефон", width: 390, height: 844 },
+    // A desktop is not simulated — the stage is already one. It takes the room
+    // it is given and the app lays out at the reader's real width.
+    desktop: { label: "Десктоп", width: 0, height: 0 },
+  }
 
-  // A desktop is not simulated — the reader is already on one. `fluid` means
-  // the frame takes whatever width it is given and the app lays out at the
-  // reader's real width, which beats scaling a pretend 1440 down to fit.
-  //
-  // `width` is a floor rather than a size: below it the app stops calling
-  // itself a desktop (its own `xl` breakpoint is 1280), and a frame labelled
-  // "Десктоп" showing the tablet rail would be a lie. Narrower than that, the
-  // frame holds 1280 and scales.
-  desktop: { label: "Десктоп", width: 1280, height: 900, fluid: true },
+/**
+ * The stage: a project running at the size of the space it is given.
+ *
+ * Never scaled. A CSS transform on a frame breaks how the browser rasterises
+ * `position: fixed` content inside it — sheets measure and hit-test correctly
+ * at full height and paint two thirds of the way down — so the frame here is
+ * always 1:1 and the stage scrolls if the device does not fit. A tall
+ * phone-shaped card is a phone; a phone with its bottom missing is a broken
+ * embed.
+ */
+export function Preview({ project }: { project: Project }) {
+  return project.embed ? <LiveStage project={project} /> : <Cover project={project} />
 }
 
 /**
- * A project, shown as well as it can be shown.
+ * The chrome: a window, the way a preview pane in an editor is a window.
  *
- * Two bodies rather than one with a flag inside, because they have no state in
- * common: the live one measures, observes and scales, the cover does none of
- * that. Which one applies is the host's decision, not a design preference — see
- * `embed` in the manifest.
- */
-export function Preview({
-  project,
-  className,
-}: {
-  project: Project
-  className?: string
-}) {
-  return project.embed ? (
-    <LiveFrame project={project} className={className} />
-  ) : (
-    <Cover project={project} className={className} />
-  )
-}
-
-/**
- * The chrome around an embed: a window, the way a preview pane in an editor is
- * a window.
- *
- * The controls used to float above the frame, unattached — a row of buttons
- * that happened to sit near a rectangle. Giving them a title bar makes them
- * belong to the thing they operate, and the bar earns its place by carrying the
- * address: seeing a real hostname is what says this is a deployment and not a
- * mockup, which is the claim the whole site rests on.
- *
- * Three groups, left to right: what to show, where it is, and how to leave.
+ * Three groups, left to right — what to show, where it is, how to leave. The
+ * middle is the point: a real hostname is what says this is a deployment rather
+ * than a mockup, which is the claim the whole site rests on.
  */
 function Window({
   url,
-  width,
   controls,
   children,
 }: {
   url: string
-  /** The window is the device: it hugs the frame rather than framing it. */
-  width?: number | string
   controls?: ReactNode
   children: ReactNode
 }) {
   const host = new URL(url).host
 
   return (
-    <div
-      className="@container mx-auto overflow-hidden rounded-xl border border-rule bg-raised shadow-[0_40px_80px_-40px_rgb(0_0_0/0.9)] transition-[width] duration-300 ease-soft"
-      style={{ width: width ?? "100%" }}
-    >
-      <div className="flex items-center gap-3 border-b border-rule px-3 py-2.5">
-        <div className="flex min-w-0 shrink-0 items-center gap-1">{controls}</div>
+    <div className="@container flex h-full min-h-0 flex-col bg-raised">
+      <div className="flex shrink-0 items-center gap-3 border-b border-rule px-3 py-2.5">
+        <div className="flex shrink-0 items-center gap-1">{controls}</div>
 
-        {/* The address, quiet and centred — read, not typed. Hidden on a narrow
-            screen, where the three groups cannot share one row and the link on
-            the right already carries the destination. */}
         <span className="label hidden flex-1 justify-center truncate rounded-full bg-ground px-3 py-1 text-center @min-[560px]:flex">
           {host}
         </span>
@@ -104,14 +65,13 @@ function Window({
         </a>
       </div>
 
-      {/* Darkest surface of the three, so a phone-width frame reads as floating
-          in the window rather than as the window itself. */}
-      <div className="bg-ground">{children}</div>
+      <div className="scroll-area min-h-0 flex-1 overflow-auto bg-ground">
+        {children}
+      </div>
     </div>
   )
 }
 
-/** The segmented control, matching the label treatment the rest of the meta uses. */
 function ViewportSwitch({
   viewports,
   value,
@@ -145,215 +105,96 @@ function ViewportSwitch({
   )
 }
 
-/**
- * Hold this page's scroll position through a frame's first moments.
- *
- * An embedded app may focus something as it boots — a chat focuses its composer
- * — and the browser then scrolls every scrollable ancestor to reveal it, this
- * page included. A reader opening a portfolio landed halfway down it, at
- * whichever project happened to grab focus first.
- *
- * The frame is a demonstration; it does not get to decide where the reader is
- * looking. So the position is taken when the frame loads and put back if it
- * moves on its own — and only then. Any real gesture calls the whole thing off,
- * because a reader who has started scrolling has said where they want to be and
- * must not be dragged back.
- *
- * `instant` matters: the page sets `scroll-behavior: smooth`, and correcting a
- * jump that should never have happened is not a journey worth animating.
- */
-function holdScroll() {
-  const top = window.scrollY
-  const until = performance.now() + 800
-  let holding = true
-
-  const release = () => {
-    holding = false
-  }
-  for (const event of ["wheel", "touchstart", "keydown"] as const) {
-    window.addEventListener(event, release, { once: true, passive: true })
-  }
-
-  const restore = () => {
-    if (!holding) return
-    if (window.scrollY !== top) window.scrollTo({ top, behavior: "instant" })
-    if (performance.now() < until) requestAnimationFrame(restore)
-    else release()
-  }
-  requestAnimationFrame(restore)
-}
-
-/**
- * The project running inside the page.
- *
- * It is an `iframe` pointing at the project's own deployment, and it is one on
- * purpose. Importing the project instead would put two applications in one
- * document: two CSS resets fighting, two React versions to reconcile, and a
- * prototype that can no longer be built without this site. A frame gives total
- * isolation for the price of one network request — and the request is deferred
- * until the reader has actually scrolled to it.
- *
- * Switching viewport does not reload anything. The frame's width changes, the
- * app inside hears its own media queries fire, and it re-lays-out — which is
- * the demonstration: one deployment, both layouts, live.
- */
-function LiveFrame({
-  project,
-  className,
-}: {
-  project: Project
-  className?: string
-}) {
+function LiveStage({ project }: { project: Project }) {
   const [viewport, setViewport] = useState<Viewport>(
     project.viewports[0] ?? "desktop",
   )
-  const size = SIZES[viewport]
-
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [available, setAvailable] = useState(0)
-
-  // Nothing is loaded until the reader is looking at it. With one project that
-  // is a nicety; by the fourth it is the difference between a page that opens
-  // and a page that boots four applications first.
-  const [started, setStarted] = useState(false)
+  const boxRef = useRef<HTMLDivElement>(null)
+  const visible = useInView(boxRef, "0px")
+  const [box, setBox] = useState({ w: 0, h: 0 })
 
   useEffect(() => {
-    const el = containerRef.current
+    const el = boxRef.current
     if (!el) return
-
     const ro = new ResizeObserver(([entry]) => {
-      if (entry) setAvailable(entry.contentRect.width)
+      if (entry)
+        setBox({
+          w: Math.round(entry.contentRect.width),
+          h: Math.round(entry.contentRect.height),
+        })
     })
     ro.observe(el)
-
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) setStarted(true)
-      },
-      // Start a little before it arrives, so the app has a head start on its
-      // own first paint rather than booting under the reader's gaze.
-      { rootMargin: "300px" },
-    )
-    io.observe(el)
-
-    return () => {
-      ro.disconnect()
-      io.disconnect()
-    }
+    return () => ro.disconnect()
   }, [])
 
-  // Scaled down only when the frame genuinely does not fit the column, which
-  // for a phone is never.
-  //
-  // It used to be scaled to fit the viewport height as well, and that had to
-  // go: a CSS transform on the iframe breaks how the browser rasterises
-  // `position: fixed` content inside it. The app's sheets measured and
-  // hit-tested correctly at full height and simply painted short — the reason
-  // the search sheet lost its bottom half in the frame while the filter sheet,
-  // being content-height, did not. Browser zoom shifted the raster and made it
-  // look fixed, which is what gave the cause away.
-  //
-  // So a phone is shown at 1:1 and the block is tall. A tall phone-shaped card
-  // is a phone; a phone with its bottom missing is a broken embed.
-  const logical = size.fluid ? Math.max(available, size.width) : size.width
-  const scale = available > 0 ? Math.min(1, available / logical) : 0
-  const shown = { width: logical * scale, height: size.height * scale }
+  const spec = SIZES[viewport]
+  // A phone keeps its own dimensions; a desktop takes the stage's.
+  const frame =
+    viewport === "phone"
+      ? { width: spec.width, height: spec.height }
+      : { width: box.w, height: box.h }
 
   return (
-    <figure ref={containerRef} className={cn("flex flex-col gap-3", className)}>
-      <Window
-        url={project.url}
-        width={shown.width || undefined}
-        controls={
-          project.viewports.length > 1 ? (
-            <ViewportSwitch
-              viewports={project.viewports}
-              value={viewport}
-              onChange={setViewport}
-            />
-          ) : (
-            <span className="label px-1">Живой прототип</span>
-          )
-        }
+    <Window
+      url={project.url}
+      controls={
+        project.viewports.length > 1 ? (
+          <ViewportSwitch
+            viewports={project.viewports}
+            value={viewport}
+            onChange={setViewport}
+          />
+        ) : (
+          <span className="label px-1">Живой прототип</span>
+        )
+      }
+    >
+      <div
+        ref={boxRef}
+        className={cn(
+          "flex h-full min-h-full w-full",
+          viewport === "phone" ? "justify-center p-6" : "",
+        )}
       >
-        {/* The window is the device, so it narrows with it. A 390px frame
-            floating in a 1780px window read as a mistake rather than as a
-            phone: the dead ground either side was wider than the device. */}
-        <div
-          className="overflow-hidden transition-[height] duration-300 ease-soft"
-          style={{ height: shown.height || 480 }}
-        >
-            {started && scale > 0 && (
-              <iframe
-                src={project.url}
-                title={`${project.title} — живой прототип`}
-                loading="lazy"
-                onLoad={holdScroll}
-                // Sized in the app's own coordinates and then scaled down as a
-                // whole, so the app never learns it is being shown small.
-                style={{
-                  width: logical,
-                  height: size.height,
-                  transform: `scale(${scale})`,
-                  transformOrigin: "top left",
-                  border: 0,
-                }}
-              />
-          )}
-        </div>
-      </Window>
-
-      <figcaption className="font-mono text-sm leading-5 text-faint">
-        Живой прототип, а не запись экрана — им можно пользоваться прямо здесь.
-      </figcaption>
-    </figure>
+        {visible && frame.width > 0 && (
+          <iframe
+            src={project.url}
+            title={`${project.title} — живой прототип`}
+            onLoad={holdScroll}
+            className={cn(
+              "border-0",
+              viewport === "phone" && "shrink-0 rounded-xl border border-rule",
+            )}
+            style={{ width: frame.width, height: frame.height }}
+          />
+        )}
+      </div>
+    </Window>
   )
 }
 
 /**
  * The stand-in for a project that refuses to be framed.
  *
- * Same window, empty of a page. Stated rather than hidden: a reader who notices
- * that one project runs inline and another does not deserves the reason, and
- * the reason is creditable — a live service with real accounts sends
+ * Stated rather than hidden: a live service with real accounts sends
  * `frame-ancestors 'none'`, and working around that to decorate a portfolio
  * would be a poor trade.
  */
-function Cover({
-  project,
-  className,
-}: {
-  project: Project
-  className?: string
-}) {
+function Cover({ project }: { project: Project }) {
   return (
-    <figure className={cn("flex flex-col gap-3", className)}>
-      <Window
-        url={project.url}
-        controls={<span className="label px-1">Боевой сайт</span>}
+    <Window
+      url={project.url}
+      controls={<span className="label px-1">Боевой сайт</span>}
+    >
+      <a
+        href={project.url}
+        target="_blank"
+        rel="noreferrer"
+        className="flex h-full min-h-full flex-col items-center justify-center gap-3 px-8 text-center"
       >
-        <a
-          href={project.url}
-          target="_blank"
-          rel="noreferrer"
-          className="group flex aspect-[16/10] items-center justify-center overflow-hidden"
-        >
-          {project.poster ? (
-            <img
-              src={project.poster}
-              alt=""
-              className="size-full object-cover object-top transition-transform duration-500 ease-soft group-hover:scale-[1.02]"
-            />
-          ) : (
-            <span className="link font-mono text-lg">Открыть проект ↗</span>
-          )}
-        </a>
-      </Window>
-
-      <figcaption className="font-mono text-sm leading-5 text-faint">
-        Запрещает встраивание в чужие страницы — открывается отдельной вкладкой.
-      </figcaption>
-    </figure>
+        <span className="label">Запрещает встраивание в чужие страницы</span>
+        <span className="link font-mono text-lg">Открыть проект ↗</span>
+      </a>
+    </Window>
   )
 }

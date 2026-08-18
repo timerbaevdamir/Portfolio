@@ -1,24 +1,35 @@
-import { findProject } from "@/data/projects"
+import { PROJECTS, findProject } from "@/data/projects"
 import { Preview } from "@/ui/Preview"
 import { useNavigate } from "@/lib/router"
 
+/**
+ * A project, laid out as the workspace it is.
+ *
+ * Three columns, borrowed from the tool this site happens to contain: a rail
+ * that only navigates, a column of prose where that tool keeps its
+ * conversation, and the thing itself running beside it. The shape earns its
+ * keep here — a case study is a description of a screen, and the screen is
+ * right there to be checked against every sentence.
+ *
+ * The page fills the viewport and does not scroll as a document. Each column
+ * scrolls on its own, so reading the notes never carries the work off screen.
+ */
 export function ProjectPage({ slug }: { slug: string }) {
   const navigate = useNavigate()
   const project = findProject(slug)
+  const index = PROJECTS.findIndex((p) => p.slug === slug)
 
   if (!project) {
     return (
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-24 sm:px-8">
-        <h1 className="text-3xl font-semibold leading-9 text-ink">
-          Такого проекта нет
-        </h1>
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-24">
+        <h1 className="font-mono text-3xl text-ink">Такого проекта нет</h1>
         <a
           href="/"
           onClick={(e) => {
             e.preventDefault()
             navigate({ name: "home" })
           }}
-          className="text-base leading-6 text-ink"
+          className="link font-mono"
         >
           ← Ко всем проектам
         </a>
@@ -26,77 +37,99 @@ export function ProjectPage({ slug }: { slug: string }) {
     )
   }
 
+  const go = (step: number) => {
+    const next = PROJECTS[(index + step + PROJECTS.length) % PROJECTS.length]
+    if (next) navigate({ name: "project", slug: next.slug })
+  }
+
   return (
-    <article className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 pb-24 pt-6 sm:px-8">
-      <a
-        href="/"
-        onClick={(e) => {
-          e.preventDefault()
-          navigate({ name: "home" })
-        }}
-        className="text-sm leading-5 text-muted transition-colors hover:text-ink"
+    <div className="flex h-full min-h-0">
+      {/* The rail stays collapsed: there is nothing here to expand into. It
+          navigates and does nothing else, which is why it can be this narrow. */}
+      <nav
+        aria-label="Проекты"
+        className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-rule py-4"
       >
-        ← Все проекты
-      </a>
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault()
+            navigate({ name: "home" })
+          }}
+          aria-label="Все проекты"
+          className="flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-raised hover:text-ink"
+        >
+          ✕
+        </a>
 
-      <header className="flex flex-col gap-5">
-        <h1 className="max-w-3xl text-[40px] font-semibold leading-[1.1] tracking-[-0.8px] text-ink">
-          {project.title}
-        </h1>
-        <p className="max-w-2xl text-lg leading-7 text-muted">
-          {project.summary}
-        </p>
-        <dl className="flex flex-wrap gap-x-10 gap-y-4 border-y border-rule py-5">
-          <div className="flex flex-col gap-1">
-            <dt className="text-sm leading-5 text-faint">Год</dt>
-            <dd className="text-base leading-6 text-ink">
-              {project.year}
-            </dd>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1">
-            <dt className="text-sm leading-5 text-faint">Стек</dt>
-            <dd className="text-base leading-6 text-ink">
-              {project.stack.join(" · ")}
-            </dd>
-          </div>
-          <div className="flex flex-col gap-1">
-            <dt className="text-sm leading-5 text-faint">Ссылки</dt>
-            <dd className="flex gap-4 text-base leading-6">
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-ink transition-opacity hover:opacity-80"
-              >
-                Демо ↗
-              </a>
-              {project.repo && (
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-ink transition-opacity hover:opacity-80"
-                >
-                  Код ↗
-                </a>
-              )}
-            </dd>
-          </div>
-        </dl>
-      </header>
+        <div className="mt-auto flex flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label="Предыдущий проект"
+            className="flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-raised hover:text-ink"
+          >
+            ↑
+          </button>
+          {/* Position, not decoration: it says how much work is here and where
+              in it you are. */}
+          <span className="label text-faint">
+            {index + 1}/{PROJECTS.length}
+          </span>
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label="Следующий проект"
+            className="flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-raised hover:text-ink"
+          >
+            ↓
+          </button>
+        </div>
+      </nav>
 
-      <Preview project={project} />
-
-      <section className="flex flex-col gap-10">
-        {project.notes.map((note) => (
-          <div key={note.title} className="flex max-w-2xl flex-col gap-3">
-            <h2 className="text-xl font-semibold leading-7 tracking-[-0.2px] text-ink">
-              {note.title}
-            </h2>
-            <p className="text-base leading-7 text-muted">{note.body}</p>
+      {/* The prose column. Where the tool keeps its conversation, this keeps
+          the account of what was decided and why. */}
+      <aside className="scroll-area hidden w-[400px] shrink-0 flex-col overflow-y-auto border-r border-rule lg:flex">
+        <header className="flex flex-col gap-4 border-b border-rule p-6">
+          <div className="flex items-baseline justify-between gap-4">
+            <h1 className="font-mono text-2xl font-medium tracking-[-0.02em] text-ink">
+              {project.title}
+            </h1>
+            <span className="label shrink-0">{project.year}</span>
           </div>
-        ))}
-      </section>
-    </article>
+          <p className="text-sm leading-6 text-muted">{project.summary}</p>
+          <p className="label">{project.stack.join(" / ")}</p>
+          {project.repo && (
+            <a
+              href={project.repo}
+              target="_blank"
+              rel="noreferrer"
+              className="link font-mono text-sm"
+            >
+              Код ↗
+            </a>
+          )}
+        </header>
+
+        <div className="flex flex-col">
+          {project.notes.map((note) => (
+            <section
+              key={note.title}
+              className="flex flex-col gap-2 border-b border-rule p-6"
+            >
+              <h2 className="font-mono text-sm font-medium text-ink">
+                {note.title}
+              </h2>
+              <p className="text-sm leading-6 text-muted">{note.body}</p>
+            </section>
+          ))}
+        </div>
+      </aside>
+
+      {/* The work itself. */}
+      <main className="min-w-0 flex-1">
+        <Preview project={project} />
+      </main>
+    </div>
   )
 }

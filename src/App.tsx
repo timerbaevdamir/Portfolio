@@ -24,7 +24,17 @@ export default function App() {
         workspace ? "h-dvh overflow-hidden" : "min-h-dvh",
       )}
     >
-      <header className="shrink-0 border-b border-rule">
+      {/* Gone on a phone inside a project: height is the scarce dimension
+          there, and the masthead spends a line of it repeating a name for a
+          reader who is looking at a screen. The rail already carries the way
+          out. Where there is room it stays — a workspace with no way back to
+          the site around it is a dead end. */}
+      <header
+        className={cn(
+          "shrink-0 border-b border-rule",
+          workspace && "hidden lg:block",
+        )}
+      >
         <div
           className={cn(
             "flex items-center justify-between gap-6 px-6 py-4",

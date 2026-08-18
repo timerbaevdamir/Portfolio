@@ -18,9 +18,13 @@ import { useNavigate } from "@/lib/router"
  */
 export function ProjectPage({ slug }: { slug: string }) {
   const navigate = useNavigate()
-  // Kept across projects on purpose: a reader who has put the notes away is
-  // there to look at the work, and moving to the next one does not change that.
-  const [notes, setNotes] = useState(true)
+  // Open where both columns fit, closed where they have to take turns: on a
+  // narrow screen the reader arrived to see the work, not to read about it
+  // first. Read once, at mount — a resize should not overrule a choice the
+  // reader has since made. Kept across projects for the same reason.
+  const [notes, setNotes] = useState(
+    () => typeof window !== "undefined" && window.innerWidth >= 1024,
+  )
   const project = findProject(slug)
   const index = PROJECTS.findIndex((p) => p.slug === slug)
 
@@ -48,12 +52,12 @@ export function ProjectPage({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="flex h-full min-h-0">
+    <div className="flex h-full min-h-0 flex-col lg:flex-row">
       {/* The rail stays collapsed: there is nothing here to expand into. It
           navigates and does nothing else, which is why it can be this narrow. */}
       <nav
         aria-label="Проекты"
-        className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-rule py-4"
+        className="flex shrink-0 items-center gap-1 border-b border-rule px-3 py-2 lg:w-14 lg:flex-col lg:border-b-0 lg:border-r lg:px-0 lg:py-4"
       >
         <a
           href="/"
@@ -67,15 +71,16 @@ export function ProjectPage({ slug }: { slug: string }) {
           ✕
         </a>
 
-        {/* Only offered where the column exists. Below `lg` there is no room
-            for it and nothing to collapse. */}
+        {/* Where both columns fit this collapses one; where they do not, it
+            swaps them. Same control, same state — the difference is only
+            whether there is room to show both at once. */}
         <button
           type="button"
           onClick={() => setNotes((open) => !open)}
           aria-pressed={notes}
-          aria-label={notes ? "Скрыть описание" : "Показать описание"}
+          aria-label={notes ? "Показать работу" : "Показать описание"}
           className={cn(
-            "hidden size-9 items-center justify-center rounded-lg transition-colors hover:bg-raised lg:flex",
+            "flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-raised",
             notes ? "text-ink" : "text-muted hover:text-ink",
           )}
         >
@@ -97,7 +102,7 @@ export function ProjectPage({ slug }: { slug: string }) {
           </svg>
         </button>
 
-        <div className="mt-auto flex flex-col items-center gap-1">
+        <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:mt-auto lg:flex-col">
           <button
             type="button"
             onClick={() => go(-1)}
@@ -126,10 +131,10 @@ export function ProjectPage({ slug }: { slug: string }) {
           the account of what was decided and why. */}
       <aside
         className={cn(
-          "scroll-area w-[400px] shrink-0 flex-col overflow-y-auto border-r border-rule",
-          // Chosen, not overridden: `cn` joins without merging, so `lg:flex`
-          // and `lg:hidden` on one element would be settled by stylesheet order.
-          notes ? "hidden lg:flex" : "hidden",
+          "scroll-area min-h-0 w-full flex-col overflow-y-auto border-rule lg:w-[400px] lg:shrink-0 lg:border-r",
+          // Chosen, not overridden: `cn` joins without merging, so two display
+          // classes on one element would be settled by stylesheet order.
+          notes ? "flex" : "hidden",
         )}
       >
         <header className="flex flex-col gap-4 border-b border-rule p-6">
@@ -201,7 +206,7 @@ export function ProjectPage({ slug }: { slug: string }) {
       </aside>
 
       {/* The work itself. */}
-      <main className="min-w-0 flex-1">
+      <main className={cn("min-w-0 flex-1", notes && "hidden lg:block")}>
         {/* Keyed by the project, so moving between them starts the stage over.
             Without it React keeps the instance — same type, same position — and
             the chosen viewport survives into a project that may not have it: a

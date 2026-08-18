@@ -8,9 +8,11 @@ const SIZES: Record<Viewport, { label: string; width: number; height: number }> 
   {
     // iPhone 14/15 — 390x844, the logical size most phones in use report.
     phone: { label: "Телефон", width: 390, height: 844 },
-    // A desktop is not simulated — the stage is already one. It takes the room
-    // it is given and the app lays out at the reader's real width.
-    desktop: { label: "Десктоп", width: 0, height: 0 },
+    // Not a size but a floor: below 1280 the job board stops calling itself a
+    // desktop — that is its own `xl` breakpoint — and a frame labelled
+    // "Десктоп" showing the tablet rail would be a lie about what is being
+    // shown. Above it the frame simply takes the room it is given.
+    desktop: { label: "Десктоп", width: 1280, height: 0 },
   }
 
 /**
@@ -127,27 +129,26 @@ function LiveStage({ project }: { project: Project }) {
   }, [])
 
   const spec = SIZES[viewport]
+  const isPhone = viewport === "phone"
 
-  // The phone is rendered at its true 390x844 and fitted to the stage.
+  // How much the frame has to shrink to fit the stage.
   //
-  // Capped at 1, never above: a phone shown larger than life would be a lie
-  // about the size of its type, which on a phone is most of the design. On a
-  // stage tall enough it therefore stops at its real size and the room left
-  // over stays empty — which is the correct amount of room to leave.
+  // A phone is capped at 1 and never larger: shown bigger than life it would
+  // misstate the size of its type, which on a phone is most of the design.
   //
-  // Fitting by transform means a CSS scale, which earlier looked like the cause
-  // of a sheet painting only part of the way down. It is not: a harness showed
-  // `fixed` and `absolute` rendering identically, and the sheets survive here.
-  // If one ever clips again, this is the first thing to suspect.
+  // A desktop shrinks only when the stage is narrower than a desktop — then it
+  // is rendered at 1280 and scaled down, rather than handed the stage's own
+  // width and made to show its tablet self under a label that says otherwise.
   const scale =
-    viewport === "phone" && box.h > 0 && box.w > 0
-      ? Math.min(1, box.h / spec.height, box.w / spec.width)
+    box.w > 0 && box.h > 0
+      ? isPhone
+        ? Math.min(1, box.w / spec.width, box.h / spec.height)
+        : Math.min(1, box.w / spec.width)
       : 1
 
-  const frame =
-    viewport === "phone"
-      ? { width: spec.width, height: spec.height }
-      : { width: box.w, height: box.h }
+  const frame = isPhone
+    ? { width: spec.width, height: spec.height }
+    : { width: Math.round(box.w / scale), height: Math.round(box.h / scale) }
 
   return (
     <Window
@@ -168,7 +169,7 @@ function LiveStage({ project }: { project: Project }) {
         ref={boxRef}
         className={cn(
           "flex h-full min-h-full w-full",
-          viewport === "phone" ? "items-center justify-center p-6" : "",
+          isPhone ? "items-center justify-center p-6" : "",
         )}
       >
         {visible && frame.width > 0 && (
@@ -178,17 +179,21 @@ function LiveStage({ project }: { project: Project }) {
             onLoad={holdScroll}
             className={cn(
               "border-0",
-              viewport === "phone" && "shrink-0 rounded-xl border border-rule",
+              isPhone && "shrink-0 rounded-xl border border-rule",
             )}
             style={{
               width: frame.width,
               height: frame.height,
-              ...(viewport === "phone" && {
-                transform: `scale(${scale})`,
-                // Centred by the flex parent, so the box it occupies has to
-                // shrink with it rather than keeping its unscaled footprint.
-                margin: `${(frame.height * (scale - 1)) / 2}px ${(frame.width * (scale - 1)) / 2}px`,
-              }),
+              transform: `scale(${scale})`,
+              // A desktop is rendered to fill the stage exactly, so it grows
+              // from the corner. A phone is centred, and a centred transform
+              // leaves the unscaled footprint behind — the negative margin
+              // shrinks the box to what is actually drawn.
+              ...(isPhone
+                ? {
+                    margin: `${(frame.height * (scale - 1)) / 2}px ${(frame.width * (scale - 1)) / 2}px`,
+                  }
+                : { transformOrigin: "top left" }),
             }}
           />
         )}

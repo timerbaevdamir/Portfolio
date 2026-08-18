@@ -60,7 +60,11 @@ function Window({
           href={url}
           target="_blank"
           rel="noreferrer"
-          className="label ml-auto shrink-0 transition-colors hover:text-ink @min-[560px]:ml-0"
+          // The one filled control in view. Everything else on this bar is a
+          // label; this is the way out to the real deployment, so it is the
+          // part that looks pressable. Same pill as the host beside it,
+          // inverted — a button rather than a second badge.
+          className="label ml-auto shrink-0 rounded-full bg-ink px-3 py-1 text-ground transition-opacity hover:opacity-85 @min-[560px]:ml-0"
         >
           Открыть ↗
         </a>

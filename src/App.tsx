@@ -1,5 +1,4 @@
 import { SITE } from "@/data/site"
-import { cn } from "@/lib/cn"
 import { useNavigate, useRoute } from "@/lib/router"
 import { Home } from "@/pages/Home"
 import { ProjectPage } from "@/pages/ProjectPage"
@@ -19,66 +18,48 @@ export default function App() {
 
   return (
     <div
-      className={cn(
-        "flex flex-col",
-        workspace ? "h-dvh overflow-hidden" : "min-h-dvh",
-      )}
+      // The whole site holds the viewport and scrolls inside its columns —
+      // the shelf has a fixed panel beside it, and a project is a workspace.
+      className="flex h-dvh flex-col overflow-hidden"
     >
-      {/* Gone on a phone inside a project: height is the scarce dimension
-          there, and the masthead spends a line of it repeating a name for a
-          reader who is looking at a screen. The rail already carries the way
-          out. Where there is room it stays — a workspace with no way back to
-          the site around it is a dead end. */}
-      <header
-        className={cn(
-          "shrink-0 border-b border-rule",
-          workspace && "hidden lg:block",
-        )}
-      >
-        <div
-          className={cn(
-            "flex items-center justify-between gap-6 px-6 py-4",
-            workspace ? "w-full" : "mx-auto w-full max-w-6xl sm:px-10",
-          )}
-        >
-          <a
-            href="/"
-            onClick={(e) => {
-              e.preventDefault()
-              navigate({ name: "home" })
-            }}
-            className="label text-ink"
-          >
-            {SITE.name}
-          </a>
-          <nav className="flex items-center gap-6">
-            {SITE.links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                className="label transition-colors hover:text-ink"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-        </div>
-      </header>
+      {/* Only inside a project, and only where there is room. The shelf
+          carries its own identity in the left column, so a masthead above it
+          would say the name twice; on a phone inside a project, height is the
+          scarce dimension and the rail already carries the way out. */}
+      {workspace && (
+        <header className="hidden shrink-0 border-b border-rule lg:block">
+          <div className="flex items-center justify-between gap-6 px-6 py-4">
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault()
+                navigate({ name: "home" })
+              }}
+              className="label text-ink"
+            >
+              {SITE.name}
+            </a>
+            <nav className="flex items-center gap-6">
+              {SITE.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="label transition-colors hover:text-ink"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </header>
+      )}
 
-      <main className={cn("flex-1", workspace && "min-h-0")}>
+      <main className="min-h-0 flex-1">
         {workspace ? <ProjectPage slug={route.slug} /> : <Home />}
       </main>
 
-      {!workspace && (
-        <footer className="border-t border-rule">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
-            <span className="label">{SITE.role}</span>
-            <span className="label">{new Date().getFullYear()}</span>
-          </div>
-        </footer>
-      )}
     </div>
   )
 }

@@ -162,7 +162,11 @@ export const PROJECTS: Project[] = [
     stack: ["Next.js", "TypeScript", "Mapbox GL", "Supabase", "Framer Motion"],
     url: "https://coffeemap.ru/map?city=moscow",
     embed: true,
-    viewports: ["phone"],
+    // Phone first: the case is about how it feels in the hand, and that is the
+    // view the notes describe. The desktop layout is a different arrangement
+    // rather than the same one widened — a rail, a column of coffee shops and
+    // the map taking the rest — so it earns its own entry.
+    viewports: ["phone", "desktop"],
     summary:
       "Работающий сервис, а не прототип: карта кофеен по городам, с " +
       "подборками и событиями. Интересен тем, как ощущается на телефоне — " +

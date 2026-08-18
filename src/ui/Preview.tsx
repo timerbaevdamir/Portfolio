@@ -140,7 +140,12 @@ function LiveStage({ project }: { project: Project }) {
   const frame =
     viewport === "phone"
       ? (() => {
-          const fitted = Math.max(480, Math.min(box.h || spec.height, 932))
+          // Three quarters of the stage, so the device sits in the space
+          // rather than filling it edge to edge.
+          const fitted = Math.max(
+            480,
+            Math.min((box.h || spec.height) * 0.75, 932),
+          )
           const width = Math.max(320, Math.round(fitted * (spec.width / spec.height)))
           return { width, height: Math.round(width * (spec.height / spec.width)) }
         })()

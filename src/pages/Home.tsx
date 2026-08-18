@@ -46,8 +46,12 @@ export function Home() {
                   </h2>
                   <span className="label shrink-0">{project.year}</span>
                 </div>
+                {/* No stack line. On a shelf a reader chooses by the work,
+                    and a row of tool names competes with the only thing that
+                    distinguishes one tile from another — its title. The tools
+                    are in the case, at the end, where someone who cares has
+                    already decided to read. */}
                 <p className="text-sm leading-6 text-muted">{project.tagline}</p>
-                <p className="label mt-auto pt-2">{project.stack.join(" / ")}</p>
               </div>
             </a>
           </li>

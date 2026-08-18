@@ -159,17 +159,6 @@ export function ProjectPage({ slug }: { slug: string }) {
             </dl>
           )}
 
-          <p className="label">{project.stack.join(" / ")}</p>
-          {project.repo && (
-            <a
-              href={project.repo}
-              target="_blank"
-              rel="noreferrer"
-              className="link font-mono text-sm"
-            >
-              Код ↗
-            </a>
-          )}
         </header>
 
         {project.goals && (
@@ -203,6 +192,31 @@ export function ProjectPage({ slug }: { slug: string }) {
             </section>
           ))}
         </div>
+
+        {/* Last, deliberately. What a thing is built with matters to the few
+            readers who ask, and it answers a question nobody has at the top of
+            a case study. */}
+        <section className="flex flex-col gap-3 border-b border-rule p-6">
+          <h2 className="label">Детали</h2>
+          <dl className="flex flex-col gap-2">
+            <div className="flex gap-4">
+              <dt className="label w-24 shrink-0">Стек</dt>
+              <dd className="text-sm leading-5 text-ink">
+                {project.stack.join(", ")}
+              </dd>
+            </div>
+          </dl>
+          {project.repo && (
+            <a
+              href={project.repo}
+              target="_blank"
+              rel="noreferrer"
+              className="link font-mono text-sm"
+            >
+              Код ↗
+            </a>
+          )}
+        </section>
       </aside>
 
       {/* The work itself. */}

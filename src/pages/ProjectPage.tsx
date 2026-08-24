@@ -57,7 +57,7 @@ export function ProjectPage({ slug }: { slug: string }) {
           navigates and does nothing else, which is why it can be this narrow. */}
       <nav
         aria-label="Проекты"
-        className="flex shrink-0 items-center gap-1 border-b border-rule px-3 py-2 lg:w-14 lg:flex-col lg:border-b-0 lg:border-r lg:px-0 lg:py-4"
+        className="flex shrink-0 items-center gap-1 px-3 py-2 lg:w-14 lg:flex-col lg:border-b-0 lg:px-0 lg:py-4"
       >
         <a
           href="/"
@@ -70,37 +70,6 @@ export function ProjectPage({ slug }: { slug: string }) {
         >
           ✕
         </a>
-
-        {/* Where both columns fit this collapses one; where they do not, it
-            swaps them. Same control, same state — the difference is only
-            whether there is room to show both at once. */}
-        <button
-          type="button"
-          onClick={() => setNotes((open) => !open)}
-          aria-pressed={notes}
-          aria-label={notes ? "Показать работу" : "Показать описание"}
-          className={cn(
-            "flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-raised",
-            notes ? "text-ink" : "text-muted hover:text-ink",
-          )}
-        >
-          <svg viewBox="0 0 16 16" fill="none" className="size-4">
-            <rect
-              x="1.75"
-              y="2.75"
-              width="12.5"
-              height="10.5"
-              rx="2"
-              stroke="currentColor"
-              strokeWidth="1.25"
-            />
-            <path
-              d="M6.25 3v10"
-              stroke="currentColor"
-              strokeWidth="1.25"
-            />
-          </svg>
-        </button>
 
         <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:mt-auto lg:flex-col">
           <button
@@ -127,16 +96,24 @@ export function ProjectPage({ slug }: { slug: string }) {
         </div>
       </nav>
 
-      {/* The prose column. Where the tool keeps its conversation, this keeps
-          the account of what was decided and why. */}
-      <aside
-        className={cn(
-          "scroll-area min-h-0 w-full flex-col overflow-y-auto border-rule lg:w-[400px] lg:shrink-0 lg:border-r",
-          // Chosen, not overridden: `cn` joins without merging, so two display
-          // classes on one element would be settled by stylesheet order.
-          notes ? "flex" : "hidden",
-        )}
-      >
+      {/* The sheet: the prose column and the stage share one raised
+          container, the way the tiles do on the shelf. The rail keeps the
+          darker ground, and colour alone marks where the work begins. */}
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-raised lg:my-2 lg:mr-2 lg:flex-row lg:rounded-2xl lg:bg-raised">
+        {/* The prose column. Where the tool keeps its conversation, this keeps
+            the account of what was decided and why. On a narrow screen it is a
+            layer over the work rather than a neighbour: the stage stays
+            mounted, and the notes come and go above it — our own sheet over
+            our own content, which is fine, unlike a control floating over a
+            live site. */}
+        <aside
+          className={cn(
+            "scroll-area overflow-y-auto border-rule lg:static lg:block lg:w-[400px] lg:shrink-0 lg:border-r",
+            // Chosen, not overridden: `cn` joins without merging, so two display
+            // classes on one element would be settled by stylesheet order.
+            notes ? "absolute inset-0 z-10 bg-raised" : "hidden lg:block",
+          )}
+        >
         <header className="flex flex-col gap-4 border-b border-rule p-6">
           <div className="flex items-baseline justify-between gap-4">
             <h1 className="font-mono text-2xl font-medium tracking-[-0.02em] text-ink">
@@ -219,15 +196,46 @@ export function ProjectPage({ slug }: { slug: string }) {
         </section>
       </aside>
 
-      {/* The work itself. */}
-      <main className={cn("min-w-0 flex-1", notes && "hidden lg:block")}>
-        {/* Keyed by the project, so moving between them starts the stage over.
-            Without it React keeps the instance — same type, same position — and
-            the chosen viewport survives into a project that may not have it: a
-            desktop-only project inherited the phone width from the one before
-            and had no switch to escape it, because it only has one. */}
-        <Preview key={project.slug} project={project} />
-      </main>
+        {/* The work itself. Always mounted — on a narrow screen the notes
+          come and go as a layer over it, and the stage stays running. */}
+        <main className="min-w-0 flex-1">
+          {/* Keyed by the project, so moving between them starts the stage over.
+              Without it React keeps the instance — same type, same position — and
+              the chosen viewport survives into a project that may not have it: a
+              desktop-only project inherited the phone width from the one before
+              and had no switch to escape it, because it only has one. */}
+          <Preview key={project.slug} project={project} />
+        </main>
+      </div>
+
+      {/* On a phone the two columns become two tabs, on a bar of their own
+          below the work rather than floating over it: the frame is a live
+          site, and nothing of this page may sit on what it is showing. Labels
+          only, no container — a pill would box what already floats free. */}
+      <div className="relative z-20 flex shrink-0 items-center justify-center gap-1 px-6 py-3 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setNotes(false)}
+            aria-pressed={!notes}
+            className={cn(
+              "rounded-full px-3 py-1 font-mono text-xs tracking-[0.02em] transition-colors",
+              !notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
+            )}
+          >
+            Контент
+          </button>
+          <button
+            type="button"
+            onClick={() => setNotes(true)}
+            aria-pressed={notes}
+            className={cn(
+              "rounded-full px-3 py-1 font-mono text-xs tracking-[0.02em] transition-colors",
+              notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
+            )}
+          >
+            Описание
+          </button>
+      </div>
     </div>
   )
 }

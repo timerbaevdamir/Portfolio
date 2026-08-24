@@ -74,7 +74,7 @@ function Window({
         </a>
       </div>
 
-      <div className="scroll-area min-h-0 flex-1 overflow-auto bg-ground">
+      <div className="scroll-area min-h-0 flex-1 overflow-auto bg-raised">
         {children}
       </div>
     </div>

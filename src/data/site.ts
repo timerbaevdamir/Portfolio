@@ -35,8 +35,16 @@ export const SITE = {
    * there is something in it.
    */
   experience: [] as { period: string; place: string; role: string }[],
+  roles: [
+    { name: "Wildberries", role: "Product Design Engineer", initials: "W" },
+    { name: "coffeemap.ru", role: "Founder", initials: "C" },
+  ] as { name: string; role: string; initials: string }[],
   links: [
+    { label: "Telegram", href: "https://t.me/etotvoedelo", primary: true },
     { label: "GitHub", href: "https://github.com/timerbaevdamir" },
-    // Почта или телеграм — когда решите, что публиковать.
-  ] as { label: string; href: string }[],
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/damir-timerbaev/",
+    },
+  ] as { label: string; href: string; primary?: boolean }[],
 }

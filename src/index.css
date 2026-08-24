@@ -107,4 +107,39 @@ body {
     scrollbar-color: var(--color-rule) transparent;
     overscroll-behavior: contain;
   }
+
+  /*
+   * A pill: compact monosapce label in a capsule, used for tabs, viewport
+   * switches, and metadata badges. The pill itself sets no colour — the
+   * caller picks the active state via `bg-ink text-ground` and the rest via
+   * `text-muted`.
+   */
+  .pill {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.02em;
+    border-radius: 9999px;
+    padding: 4px 12px;
+    transition: color 150ms var(--ease-soft);
+  }
+
+  /*
+   * A button in the project-page rail: compact, icon-only, 36×36. The
+   * hover state inverts the colour without changing the background layer.
+   */
+  .rail-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    color: var(--color-muted);
+    transition: color 150ms var(--ease-soft), background-color 150ms var(--ease-soft);
+  }
+  .rail-btn:hover {
+    background-color: var(--color-raised);
+    color: var(--color-ink);
+  }
 }

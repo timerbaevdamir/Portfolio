@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { cn } from "@/lib/cn"
+import { X, ChevronUp, ChevronDown, ExternalLink } from "lucide-react"
 import { PROJECTS, findProject } from "@/data/projects"
 import { Preview } from "@/ui/Preview"
 import { useNavigate } from "@/lib/router"
@@ -66,9 +67,9 @@ export function ProjectPage({ slug }: { slug: string }) {
             navigate({ name: "home" })
           }}
           aria-label="Все проекты"
-          className="flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-raised hover:text-ink"
+          className="rail-btn"
         >
-          ✕
+          <X size={16} />
         </a>
 
         {/* On a phone the two columns become two tabs in the rail, beside
@@ -81,7 +82,7 @@ export function ProjectPage({ slug }: { slug: string }) {
             onClick={() => setNotes(false)}
             aria-pressed={!notes}
             className={cn(
-              "rounded-full px-3 py-1.5 font-mono text-xs tracking-[0.02em] transition-colors",
+              "pill",
               !notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
             )}
           >
@@ -92,7 +93,7 @@ export function ProjectPage({ slug }: { slug: string }) {
             onClick={() => setNotes(true)}
             aria-pressed={notes}
             className={cn(
-              "rounded-full px-3 py-1.5 font-mono text-xs tracking-[0.02em] transition-colors",
+              "pill",
               notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
             )}
           >
@@ -105,9 +106,9 @@ export function ProjectPage({ slug }: { slug: string }) {
             type="button"
             onClick={() => go(-1)}
             aria-label="Предыдущий проект"
-            className="flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-raised hover:text-ink"
+            className="rail-btn"
           >
-            ↑
+            <ChevronUp size={16} />
           </button>
           {/* Position, not decoration: it says how much work is here and where
               in it you are. */}
@@ -118,9 +119,9 @@ export function ProjectPage({ slug }: { slug: string }) {
             type="button"
             onClick={() => go(1)}
             aria-label="Следующий проект"
-            className="flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-raised hover:text-ink"
+            className="rail-btn"
           >
-            ↓
+            <ChevronDown size={16} />
           </button>
         </div>
       </nav>
@@ -128,7 +129,7 @@ export function ProjectPage({ slug }: { slug: string }) {
       {/* The sheet: the prose column and the stage share one raised
           container, the way the tiles do on the shelf. The rail keeps the
           darker ground, and colour alone marks where the work begins. */}
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-raised lg:my-2 lg:mr-2 lg:flex-row lg:rounded-2xl lg:bg-raised">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-raised lg:my-2 lg:mr-2 lg:flex-row">
         {/* The prose column. Where the tool keeps its conversation, this keeps
             the account of what was decided and why. On a narrow screen it is a
             layer over the work rather than a neighbour: the stage stays
@@ -219,7 +220,7 @@ export function ProjectPage({ slug }: { slug: string }) {
               rel="noreferrer"
               className="link font-mono text-sm"
             >
-              Код ↗
+              Код <ExternalLink size={14} className="inline" />
             </a>
           )}
         </section>

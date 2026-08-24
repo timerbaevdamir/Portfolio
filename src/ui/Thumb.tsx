@@ -58,7 +58,7 @@ export function Thumb({ project, className }: { project: Project; className?: st
         // own. `isolate` gives the radius a stacking context to clip against —
         // the frame inside is composited, and a plain overflow clip has never
         // been reliable over that.
-        "relative isolate overflow-hidden rounded-xl border border-rule bg-ground transition-colors",
+        "relative isolate overflow-hidden rounded-2xl border border-rule bg-ground transition-colors",
         className,
       )}
       style={{ height: height || 220 }}

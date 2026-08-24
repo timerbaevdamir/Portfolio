@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { cn } from "@/lib/cn"
+import { ExternalLink } from "lucide-react"
 import { useInView } from "@/lib/useInView"
 import { holdScroll } from "@/lib/holdScroll"
 import type { Project, Viewport } from "@/data/projects"
@@ -56,7 +57,7 @@ function Window({
       <div className="flex shrink-0 items-center gap-3 border-b border-rule px-3 py-2.5">
         <div className="flex shrink-0 items-center gap-1">{controls}</div>
 
-        <span className="label hidden flex-1 justify-center truncate rounded-full bg-ground px-3 py-1 text-center @min-[560px]:flex">
+        <span className="label pill hidden flex-1 justify-center truncate bg-ground text-center @min-[560px]:flex">
           {host}
         </span>
 
@@ -68,9 +69,9 @@ function Window({
           // label; this is the way out to the real deployment, so it is the
           // part that looks pressable. Same pill as the host beside it,
           // inverted — a button rather than a second badge.
-          className="label ml-auto shrink-0 rounded-full bg-ink px-3 py-1 text-ground transition-opacity hover:opacity-85 @min-[560px]:ml-0"
+          className="label pill ml-auto shrink-0 bg-ink text-ground transition-opacity hover:opacity-85 @min-[560px]:ml-0"
         >
-          Открыть ↗
+          Открыть <ExternalLink size={14} className="inline" />
         </a>
       </div>
 
@@ -103,7 +104,7 @@ function ViewportSwitch({
           onClick={() => onChange(v)}
           aria-pressed={v === value}
           className={cn(
-            "label rounded-full px-3 py-1 transition-colors",
+            "label pill transition-colors",
             v === value ? "bg-raised text-ink" : "hover:text-ink",
           )}
         >
@@ -244,7 +245,7 @@ function Cover({ project, note }: { project: Project; note: string }) {
         className="flex h-full min-h-full flex-col items-center justify-center gap-3 px-8 text-center"
       >
         <span className="label">{note}</span>
-        <span className="link font-mono text-lg">Открыть проект ↗</span>
+        <span className="link font-mono text-lg">Открыть проект <ExternalLink size={14} className="inline" /></span>
       </a>
     </Window>
   )

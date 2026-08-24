@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/cn"
 import { SITE } from "@/data/site"
 import { PROJECTS } from "@/data/projects"
 import { Thumb } from "@/ui/Thumb"
@@ -68,6 +69,22 @@ export function Home() {
 
           <p className="text-sm leading-6 text-muted">{SITE.about}</p>
 
+          {SITE.roles.length > 0 && (
+            <section className="flex flex-col gap-3">
+              {SITE.roles.map((role) => (
+                <div key={role.name} className="flex items-center gap-3">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-rule font-mono text-xs text-muted">
+                    {role.initials}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-mono text-sm font-medium text-ink">{role.name}</span>
+                    <span className="text-sm leading-5 text-muted">{role.role}</span>
+                  </div>
+                </div>
+              ))}
+            </section>
+          )}
+
           {SITE.experience.length > 0 && (
             <section className="flex flex-col gap-4">
               <h2 className="label">Опыт</h2>
@@ -84,16 +101,21 @@ export function Home() {
           )}
         </div>
 
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-row flex-wrap items-center gap-2">
           {SITE.links.map((link) => (
             <a
               key={link.href}
               href={link.href}
               target="_blank"
               rel="noreferrer"
-              className="link font-mono text-sm"
+              className={cn(
+                "pill inline-flex items-center gap-1.5",
+                link.primary
+                  ? "bg-ink text-ground transition-opacity hover:opacity-85"
+                  : "bg-raised text-muted transition-colors hover:text-ink",
+              )}
             >
-              {link.label} ↗
+              {link.label}
             </a>
           ))}
         </nav>
@@ -131,6 +153,22 @@ export function Home() {
         >
           <p className="text-sm leading-6 text-muted">{SITE.about}</p>
 
+          {SITE.roles.length > 0 && (
+            <section className="flex flex-col gap-3">
+              {SITE.roles.map((role) => (
+                <div key={role.name} className="flex items-center gap-3">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-rule font-mono text-xs text-muted">
+                    {role.initials}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-mono text-sm font-medium text-ink">{role.name}</span>
+                    <span className="text-sm leading-5 text-muted">{role.role}</span>
+                  </div>
+                </div>
+              ))}
+            </section>
+          )}
+
           {SITE.experience.length > 0 && (
             <section className="flex flex-col gap-3">
               <h2 className="label">Опыт</h2>
@@ -146,16 +184,21 @@ export function Home() {
             </section>
           )}
 
-          <nav className="flex flex-col items-start gap-2">
+          <nav className="flex flex-row flex-wrap items-center gap-2">
             {SITE.links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 target="_blank"
                 rel="noreferrer"
-                className="link font-mono text-sm"
+                className={cn(
+                  "pill inline-flex items-center gap-1.5",
+                  link.primary
+                    ? "bg-ink text-ground transition-opacity hover:opacity-85"
+                    : "bg-raised text-muted transition-colors hover:text-ink",
+                )}
               >
-                {link.label} ↗
+                {link.label}
               </a>
             ))}
           </nav>
@@ -168,7 +211,7 @@ export function Home() {
             The panel is the scroller at every width: on a phone it sits
             below the header, on a wide screen it fills the sheet entirely,
             and `main` only clips. */}
-        <div className="scroll-area absolute inset-x-0 bottom-0 top-16 z-10 overflow-y-auto rounded-t-2xl lg:top-0 lg:rounded-none">
+        <div className="scroll-area absolute inset-x-0 bottom-0 top-16 z-10 overflow-y-auto rounded-t-3xl lg:top-0 lg:rounded-none">
           {/* Keeps the sheet below the pocket at rest; see-through and
               click-through, so the column beneath stays readable and its
               links stay tappable. */}
@@ -178,12 +221,12 @@ export function Home() {
             style={{ height: pocketHeight }}
           />
 
-          <div className="mx-auto w-full max-w-4xl rounded-t-2xl bg-raised px-6 pb-24 lg:rounded-none lg:bg-transparent lg:px-10">
+          <div className="mx-auto w-full max-w-4xl rounded-t-3xl bg-raised px-6 pb-24 lg:rounded-none lg:bg-transparent lg:px-10">
             {/* A heading over the work, not a hero above it. The column on the
                 left already says whose work this is, and the tiles say better
                 than a sentence can what the work is — so this stays a label and
                 gives the room back. */}
-            <section className="flex flex-col gap-3 py-12 lg:py-16">
+            <section className="flex flex-col gap-3 py-8 lg:py-16">
               <h1 className="font-mono text-2xl font-medium tracking-[-0.02em] text-ink">
                 {SITE.headline}
               </h1>
@@ -203,7 +246,7 @@ export function Home() {
                     }}
                     className="group flex flex-col gap-4"
                   >
-                    <Thumb project={project} className="group-hover:border-muted" />
+                    <Thumb project={project} className="group-hover:border-faint" />
                     {/* Tight to the title: a tagline is the second line of a
                         name, not a paragraph after it. */}
                     <div className="flex flex-col gap-1">

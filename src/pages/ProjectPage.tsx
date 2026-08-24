@@ -71,6 +71,35 @@ export function ProjectPage({ slug }: { slug: string }) {
           ✕
         </a>
 
+        {/* On a phone the two columns become two tabs in the rail, beside
+            the way out — control bar space is the one place on the page
+            that is always free of the work. Labels only: the state either
+            is or is not here, no icon needed to say so. */}
+        <div className="ml-1 flex items-center gap-0.5 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setNotes(false)}
+            aria-pressed={!notes}
+            className={cn(
+              "rounded-full px-3 py-1.5 font-mono text-xs tracking-[0.02em] transition-colors",
+              !notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
+            )}
+          >
+            Контент
+          </button>
+          <button
+            type="button"
+            onClick={() => setNotes(true)}
+            aria-pressed={notes}
+            className={cn(
+              "rounded-full px-3 py-1.5 font-mono text-xs tracking-[0.02em] transition-colors",
+              notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
+            )}
+          >
+            Описание
+          </button>
+        </div>
+
         <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:mt-auto lg:flex-col">
           <button
             type="button"
@@ -206,35 +235,6 @@ export function ProjectPage({ slug }: { slug: string }) {
               and had no switch to escape it, because it only has one. */}
           <Preview key={project.slug} project={project} />
         </main>
-      </div>
-
-      {/* On a phone the two columns become two tabs, on a bar of their own
-          below the work rather than floating over it: the frame is a live
-          site, and nothing of this page may sit on what it is showing. Labels
-          only, no container — a pill would box what already floats free. */}
-      <div className="relative z-20 flex shrink-0 items-center justify-center gap-1 px-6 py-3 lg:hidden">
-          <button
-            type="button"
-            onClick={() => setNotes(false)}
-            aria-pressed={!notes}
-            className={cn(
-              "rounded-full px-3 py-1 font-mono text-xs tracking-[0.02em] transition-colors",
-              !notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
-            )}
-          >
-            Контент
-          </button>
-          <button
-            type="button"
-            onClick={() => setNotes(true)}
-            aria-pressed={notes}
-            className={cn(
-              "rounded-full px-3 py-1 font-mono text-xs tracking-[0.02em] transition-colors",
-              notes ? "bg-ink text-ground" : "text-muted hover:text-ink",
-            )}
-          >
-            Описание
-          </button>
       </div>
     </div>
   )

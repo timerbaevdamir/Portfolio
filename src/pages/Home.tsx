@@ -155,7 +155,7 @@ export function Home({ theme, onToggleTheme }: ThemeProps) {
 
           <div className="min-h-full rounded-t-3xl bg-raised px-5 pb-16 lg:rounded-none lg:px-8 xl:px-12">
             <div className="mx-auto w-full max-w-[1120px]">
-              <header className="flex flex-col gap-3 pb-7 pt-8 lg:pb-9 lg:pt-12">
+              <header className="flex flex-col gap-2 py-6">
                 <div className="flex items-center gap-3">
                   <h1 className="text-[28px] font-medium tracking-[-0.035em] text-ink lg:text-[32px]">
                     {SITE.headline}
@@ -181,16 +181,19 @@ export function Home({ theme, onToggleTheme }: ThemeProps) {
                       }}
                       className="group flex h-full flex-col rounded-[22px] bg-ground p-2 transition-colors duration-200 hover:bg-surface/60 focus-visible:bg-surface/60"
                     >
-                      <Thumb project={project} />
-                      <div className="flex flex-1 flex-col gap-2 px-3 pb-4 pt-4">
-                        <div className="flex items-center justify-between gap-3">
-                          <h2 className="text-xl font-medium tracking-[-0.025em] text-ink">
-                            {project.title}
-                          </h2>
-                          <span className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors group-hover:bg-ink group-hover:text-ground group-focus-visible:bg-ink group-focus-visible:text-ground">
-                            <ArrowUpRight size={18} aria-hidden />
-                          </span>
-                        </div>
+                      <div className="relative isolate shrink-0">
+                        <Thumb project={project} />
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute right-3 top-3 z-10 flex size-9 items-center justify-center rounded-full bg-ink text-ground opacity-0 shadow-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+                        >
+                          <ArrowUpRight size={18} />
+                        </span>
+                      </div>
+                      <div className="flex flex-1 flex-col gap-1 px-3 py-3">
+                        <h2 className="text-xl font-medium tracking-[-0.025em] text-ink">
+                          {project.title}
+                        </h2>
                         <p className="text-sm leading-6 text-muted">{project.tagline}</p>
                       </div>
                     </a>

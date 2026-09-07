@@ -50,10 +50,10 @@ function Window({
 
   return (
     <div className="@container flex h-full min-h-0 flex-col bg-raised">
-      <div className="flex shrink-0 items-center gap-3 border-b border-rule/70 px-3 py-3">
-        <div className="flex shrink-0 items-center gap-1">{controls}</div>
+      <div className="flex shrink-0 items-stretch gap-3 border-b border-rule/70 px-3 py-3">
+        <div className="flex min-h-11 shrink-0 items-center gap-1">{controls}</div>
 
-        <span className="hidden min-h-9 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-ground px-3 py-2 text-sm leading-5 text-muted @min-[560px]:flex">
+        <span className="hidden min-h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-ground px-3 py-2 text-sm leading-5 text-muted @min-[560px]:flex">
           <Globe2 size={14} className="shrink-0" aria-hidden />
           <span className="truncate">{host}</span>
         </span>
@@ -63,9 +63,9 @@ function Window({
           target="_blank"
           rel="noreferrer"
           // The primary action opens the deployment at its own address.
-          className="pill ml-auto shrink-0 bg-ink text-ground hover:bg-ink-hover @min-[560px]:ml-0"
+          className="pill ml-auto min-h-11 shrink-0 bg-ink text-ground hover:bg-ink-hover @min-[560px]:ml-0"
         >
-          Открыть <ExternalLink size={14} className="inline" />
+          Открыть
         </a>
       </div>
 
@@ -101,7 +101,7 @@ function ViewportSwitch({
           title={SIZES[v].label}
           className={cn(
             "pill px-3",
-            v === value ? "bg-surface text-ink" : "text-muted hover:text-ink",
+            v === value ? "bg-selected text-ink" : "text-muted hover:text-ink",
           )}
         >
           {v === "phone" ? <Smartphone size={15} aria-hidden /> : <Monitor size={15} aria-hidden />}

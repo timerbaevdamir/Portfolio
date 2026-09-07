@@ -76,14 +76,14 @@ export function ProjectPage({ slug }: { slug: string }) {
             the way out — control bar space is the one place on the page
             that is always free of the work. Labels only: the state either
             is or is not here, no icon needed to say so. */}
-        <div className="flex min-w-0 items-center gap-0.5 rounded-full bg-raised p-1 lg:hidden">
+        <div className="flex min-w-0 items-center gap-0.5 rounded-full bg-ground p-1 lg:hidden">
           <button
             type="button"
             onClick={() => setNotes(false)}
             aria-pressed={!notes}
             className={cn(
               "pill px-3",
-              !notes ? "bg-surface text-ink" : "text-muted hover:text-ink",
+              !notes ? "bg-selected text-ink" : "text-muted hover:text-ink",
             )}
           >
             Прототип
@@ -94,7 +94,7 @@ export function ProjectPage({ slug }: { slug: string }) {
             aria-pressed={notes}
             className={cn(
               "pill px-3",
-              notes ? "bg-surface text-ink" : "text-muted hover:text-ink",
+              notes ? "bg-selected text-ink" : "text-muted hover:text-ink",
             )}
           >
             Описание
@@ -138,7 +138,7 @@ export function ProjectPage({ slug }: { slug: string }) {
             live site. */}
         <aside
           className={cn(
-            "scroll-area overflow-y-auto border-rule lg:static lg:block lg:w-[340px] xl:w-[380px] lg:shrink-0 lg:border-r",
+            "scroll-area overflow-y-auto border-rule/70 lg:static lg:block lg:w-[340px] xl:w-[380px] lg:shrink-0 lg:border-r",
             // Chosen, not overridden: `cn` joins without merging, so two display
             // classes on one element would be settled by stylesheet order.
             notes ? "absolute inset-0 z-10 bg-raised" : "hidden",

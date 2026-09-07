@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { ArrowUpRight, LayoutGrid } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/cn"
 import { SITE } from "@/data/site"
 import { PROJECTS } from "@/data/projects"
@@ -163,7 +163,6 @@ export function Home({ theme, onToggleTheme }: ThemeProps) {
                   <span className="flex h-7 min-w-7 items-center justify-center rounded-lg bg-surface px-2 text-sm tabular-nums text-muted">
                     {PROJECTS.length}
                   </span>
-                  <LayoutGrid size={18} className="ml-auto text-faint" aria-hidden />
                 </div>
                 <p className="max-w-[58ch] text-base leading-7 text-muted">
                   {SITE.intro}
@@ -180,7 +179,7 @@ export function Home({ theme, onToggleTheme }: ThemeProps) {
                         e.preventDefault()
                         navigate({ name: "project", slug: project.slug })
                       }}
-                      className="group flex h-full flex-col rounded-[22px] border border-rule/70 bg-ground/35 p-2 transition-colors duration-200 hover:border-ink/20 hover:bg-surface/60 focus-visible:bg-surface/60"
+                      className="group flex h-full flex-col rounded-[22px] bg-ground p-2 transition-colors duration-200 hover:bg-surface/60 focus-visible:bg-surface/60"
                     >
                       <Thumb project={project} />
                       <div className="flex flex-1 flex-col gap-2 px-3 pb-4 pt-4">

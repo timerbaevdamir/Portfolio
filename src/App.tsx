@@ -1,3 +1,4 @@
+import { useTheme } from "@/lib/useTheme"
 import { useRoute } from "@/lib/router"
 import { Home } from "@/pages/Home"
 import { ProjectPage } from "@/pages/ProjectPage"
@@ -14,10 +15,15 @@ import { ProjectPage } from "@/pages/ProjectPage"
  */
 export default function App() {
   const route = useRoute()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <div className="h-dvh overflow-hidden">
-      {route.name === "project" ? <ProjectPage slug={route.slug} /> : <Home />}
+      {route.name === "project" ? (
+        <ProjectPage slug={route.slug} />
+      ) : (
+        <Home theme={theme} onToggleTheme={toggleTheme} />
+      )}
     </div>
   )
 }

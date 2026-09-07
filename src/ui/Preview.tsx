@@ -63,7 +63,7 @@ function Window({
           target="_blank"
           rel="noreferrer"
           // The primary action opens the deployment at its own address.
-          className="pill ml-auto shrink-0 bg-ink text-ground hover:bg-white @min-[560px]:ml-0"
+          className="pill ml-auto shrink-0 bg-ink text-ground hover:bg-ink-hover @min-[560px]:ml-0"
         >
           Открыть <ExternalLink size={14} className="inline" />
         </a>
@@ -190,7 +190,7 @@ function LiveStage({ project }: { project: Project }) {
               // the stage's width, which is the very thing the desktop frame
               // exists to avoid.
               "shrink-0 border-0",
-              isPhone ? "rounded-[28px] ring-1 ring-white/15 shadow-2xl" : "",
+              isPhone ? "rounded-[28px] ring-1 ring-ink/15 shadow-2xl" : "",
             )}
             style={{
               width: frame.width,

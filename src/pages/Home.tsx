@@ -3,30 +3,42 @@ import { ArrowUpRight, LayoutGrid } from "lucide-react"
 import { cn } from "@/lib/cn"
 import { SITE } from "@/data/site"
 import { PROJECTS } from "@/data/projects"
+import type { Theme } from "@/lib/useTheme"
+import { ThemeToggle } from "@/ui/ThemeToggle"
 import { Thumb } from "@/ui/Thumb"
 import { useNavigate } from "@/lib/router"
 
-function Identity({ compact = false }: { compact?: boolean }) {
+type ThemeProps = { theme: Theme; onToggleTheme: () => void }
+
+function Identity({ compact = false, theme, onToggleTheme }: ThemeProps & { compact?: boolean }) {
   return (
-    <div className={cn("flex", compact ? "items-center gap-3" : "flex-col gap-5")}>
-      {SITE.avatar && (
-        <img
-          src={SITE.avatar}
-          alt=""
-          width={compact ? 40 : 56}
-          height={compact ? 40 : 56}
-          className={cn("rounded-full object-cover ring-1 ring-white/10", compact ? "size-10" : "size-14")}
-          onError={(event) => {
-            event.currentTarget.style.display = "none"
-          }}
-        />
-      )}
-      <div className="flex flex-col gap-1">
+    <div className={cn("flex w-full", compact ? "items-center gap-3" : "flex-col gap-5")}>
+      <div className={cn("flex shrink-0 items-center", compact ? "" : "justify-between")}>
+        {SITE.avatar && (
+          <img
+            src={SITE.avatar}
+            alt=""
+            width={compact ? 40 : 56}
+            height={compact ? 40 : 56}
+            className={cn("rounded-full object-cover ring-1 ring-ink/10", compact ? "size-10" : "size-14")}
+            onError={(event) => {
+              event.currentTarget.style.display = "none"
+            }}
+          />
+        )}
+        {!compact && <ThemeToggle theme={theme} onToggle={onToggleTheme} />}
+      </div>
+      <div className="flex min-w-0 flex-col gap-1">
         <span className={cn("font-medium tracking-[-0.025em] text-ink", compact ? "text-base" : "text-xl")}>
           {SITE.name}
         </span>
         <span className="text-sm text-muted">{SITE.role}</span>
       </div>
+      {compact && (
+        <div className="ml-auto">
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        </div>
+      )}
     </div>
   )
 }
@@ -82,8 +94,8 @@ function Contacts() {
           className={cn(
             "pill min-h-10",
             link.primary
-              ? "bg-ink text-ground hover:bg-white"
-              : "text-muted hover:bg-surface hover:text-ink",
+              ? "bg-ink text-ground hover:bg-ink-hover"
+              : "bg-surface text-ink hover:bg-rule",
           )}
         >
           {link.label}
@@ -95,7 +107,7 @@ function Contacts() {
 }
 
 /** Fixed profile on desktop; on mobile the project sheet scrolls over it. */
-export function Home() {
+export function Home({ theme, onToggleTheme }: ThemeProps) {
   const navigate = useNavigate()
   const pocketRef = useRef<HTMLDivElement>(null)
   const [pocketHeight, setPocketHeight] = useState(0)
@@ -115,15 +127,15 @@ export function Home() {
     <div className="flex h-full min-h-0">
       <aside className="scroll-area hidden w-[300px] shrink-0 flex-col justify-between gap-10 overflow-y-auto px-7 py-9 lg:flex xl:w-[320px] xl:px-8">
         <div className="flex flex-col gap-9">
-          <Identity />
+          <Identity theme={theme} onToggleTheme={onToggleTheme} />
           <About />
         </div>
         <Contacts />
       </aside>
 
-      <main className="relative min-h-0 min-w-0 flex-1 overflow-hidden lg:my-3 lg:mr-3 lg:rounded-3xl lg:border lg:border-white/5 lg:bg-raised">
+      <main className="relative min-h-0 min-w-0 flex-1 overflow-hidden lg:my-3 lg:mr-3 lg:rounded-3xl lg:border lg:border-ink/5 lg:bg-raised">
         <div className="absolute inset-x-0 top-0 z-20 flex h-20 items-center bg-ground px-5 lg:hidden">
-          <Identity compact />
+          <Identity compact theme={theme} onToggleTheme={onToggleTheme} />
         </div>
 
         <div
@@ -168,7 +180,7 @@ export function Home() {
                         e.preventDefault()
                         navigate({ name: "project", slug: project.slug })
                       }}
-                      className="group flex h-full flex-col rounded-[22px] border border-rule/70 bg-ground/35 p-2 transition-colors duration-200 hover:border-white/20 hover:bg-surface/60 focus-visible:bg-surface/60"
+                      className="group flex h-full flex-col rounded-[22px] border border-rule/70 bg-ground/35 p-2 transition-colors duration-200 hover:border-ink/20 hover:bg-surface/60 focus-visible:bg-surface/60"
                     >
                       <Thumb project={project} />
                       <div className="flex flex-1 flex-col gap-2 px-3 pb-4 pt-4">

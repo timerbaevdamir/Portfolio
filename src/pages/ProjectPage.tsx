@@ -129,7 +129,7 @@ export function ProjectPage({ slug }: { slug: string }) {
       {/* The sheet: the prose column and the stage share one raised
           container, the way the tiles do on the shelf. The rail keeps the
           darker ground, and colour alone marks where the work begins. */}
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-3xl border border-white/5 bg-raised lg:my-3 lg:mr-3 lg:rounded-3xl lg:flex-row">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-3xl border border-ink/5 bg-raised lg:my-3 lg:mr-3 lg:rounded-3xl lg:flex-row">
         {/* The prose column. Where the tool keeps its conversation, this keeps
             the account of what was decided and why. On a narrow screen it is a
             layer over the work rather than a neighbour: the stage stays

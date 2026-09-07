@@ -70,7 +70,7 @@ export function Thumb({ project, className }: { project: Project; className?: st
           onLoad={holdScroll}
           className={cn(
             "pointer-events-none absolute left-1/2 origin-top border-0",
-            showsPhone ? "top-[7%] rounded-[28px] shadow-2xl ring-1 ring-white/15" : "top-0",
+            showsPhone ? "top-[7%] rounded-[28px] shadow-2xl ring-1 ring-ink/15" : "top-0",
           )}
           style={{
             width: size.w,
@@ -81,7 +81,7 @@ export function Thumb({ project, className }: { project: Project; className?: st
         />
       ) : project.embed !== true ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
-          <span className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-ink">
+          <span className="flex size-12 items-center justify-center rounded-2xl border border-ink/10 bg-ink/5 text-ink">
             <Globe2 size={24} />
           </span>
           <span className="text-lg font-medium tracking-[-0.025em] text-ink">

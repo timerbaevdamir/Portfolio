@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,8 +8,18 @@
       name="description"
       content="Продуктовый дизайнер. Прототипы, которые можно открыть и потрогать, а не посмотреть на скриншотах."
     />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#141414" />
+    <script>
+      try {
+        if (localStorage.getItem("portfolio-theme") === "light") {
+          document.documentElement.dataset.theme = "light"
+          document.querySelector('meta[name="theme-color"]').setAttribute("content", "#f5f5f5")
+        }
+      } catch {
+        // Keep the default dark theme when storage is unavailable.
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>

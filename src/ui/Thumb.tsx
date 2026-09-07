@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react"
+import { ArrowUpRight, Globe2 } from "lucide-react"
 import { cn } from "@/lib/cn"
 import { useInView } from "@/lib/useInView"
 import { holdScroll } from "@/lib/holdScroll"
@@ -16,9 +17,8 @@ const LOGICAL = { desktop: { w: 1280, h: 800 }, phone: { w: 390, h: 844 } }
  * assistive tech, because the tile's job is to be clicked, not used. Using it
  * happens on the project's own page.
  *
- * Scaling is safe at this size for the reason it was not safe at full size: a
- * transformed frame mis-rasterises `position: fixed` content, and nothing here
- * opens a sheet — the app is shown exactly as it boots.
+ * The thumbnail shows only the initial screen; all interaction belongs to
+ * the full preview on the project page.
  */
 export function Thumb({ project, className }: { project: Project; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -47,21 +47,18 @@ export function Thumb({ project, className }: { project: Project; className?: st
   const showsPhone = project.viewports.includes("phone")
   const size = showsPhone ? LOGICAL.phone : LOGICAL.desktop
   const height = width * 0.625
-  const scale = showsPhone ? height / size.h : width / size.w
+  const scale = showsPhone ? (height * 0.86) / size.h : width / size.w
 
   return (
     <div
       ref={ref}
       className={cn(
-        // Rounded and edged here rather than by a card around it: the picture
-        // is the only part that needs a boundary, and it now has to draw its
-        // own. `isolate` gives the radius a stacking context to clip against —
-        // the frame inside is composited, and a plain overflow clip has never
-        // been reliable over that.
-        "relative isolate overflow-hidden rounded-2xl border border-rule bg-ground transition-colors",
+        // Isolate the composited iframe so its corners stay clipped.
+        "relative isolate overflow-hidden rounded-[15px] bg-surface",
         className,
       )}
-      style={{ height: height || 220 }}
+      style={{ aspectRatio: "8 / 5" }}
+      aria-hidden
     >
       {project.embed === true && visible && scale > 0 ? (
         <iframe
@@ -71,7 +68,10 @@ export function Thumb({ project, className }: { project: Project; className?: st
           tabIndex={-1}
           loading="lazy"
           onLoad={holdScroll}
-          className="pointer-events-none absolute left-1/2 top-0 origin-top border-0"
+          className={cn(
+            "pointer-events-none absolute left-1/2 origin-top border-0",
+            showsPhone ? "top-[7%] rounded-[28px] shadow-2xl ring-1 ring-white/15" : "top-0",
+          )}
           style={{
             width: size.w,
             height: size.h,
@@ -79,8 +79,20 @@ export function Thumb({ project, className }: { project: Project; className?: st
             transformOrigin: "top center",
           }}
         />
+      ) : project.embed !== true ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
+          <span className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-ink">
+            <Globe2 size={24} />
+          </span>
+          <span className="text-lg font-medium tracking-[-0.025em] text-ink">
+            {new URL(project.url).host}
+          </span>
+          <span className="flex items-center gap-1.5 text-xs text-muted">
+            На отдельном сайте <ArrowUpRight size={13} />
+          </span>
+        </div>
       ) : (
-        <span className="label absolute inset-0 flex items-center justify-center">
+        <span className="absolute inset-0 flex items-center justify-center text-sm text-faint">
           {new URL(project.url).host}
         </span>
       )}

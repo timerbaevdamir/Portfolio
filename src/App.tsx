@@ -16,8 +16,8 @@ export default function App() {
   const route = useRoute()
 
   return (
-    <main className="h-dvh overflow-hidden">
+    <div className="h-dvh overflow-hidden">
       {route.name === "project" ? <ProjectPage slug={route.slug} /> : <Home />}
-    </main>
+    </div>
   )
 }

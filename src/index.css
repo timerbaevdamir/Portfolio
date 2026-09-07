@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
 @theme static {
@@ -9,34 +9,16 @@
 }
 
 @theme {
-  /*
-   * IBM Plex, because the subject is engineering precision applied to feel —
-   * someone who argues about how long a sheet should take to close. Plex was
-   * drawn for exactly that world, and the mono is used as the display face
-   * rather than as decoration for code: a spec sheet, set well.
-   *
-   * Not Inter. Inter is the correct choice inside the products shown here and
-   * the reflexive one out here, which is the problem.
-   */
-  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-sans: 'Google Sans', ui-sans-serif, system-ui, sans-serif;
 
-  /*
-   * One idea holds the whole palette: the only colour on this page is the
-   * work. Everything the site itself draws is ink, paper and one hairline —
-   * so a prototype loading inside a frame is the single saturated thing in
-   * view, and it does not have to compete with a brand.
-   *
-   * The dark is warm and brown-biased rather than the usual cool near-black,
-   * and there is deliberately no accent hue. A lone violet or acid-green pop
-   * on near-black is the house style of every generated portfolio.
-   */
-  --color-ground: #12100e;
-  --color-raised: #1a1815;
-  --color-ink: #f2efe9;
-  --color-muted: #918a80;
-  --color-faint: #6a645c;
-  --color-rule: #2b2723;
+  /* Neutral surfaces leave colour to the projects themselves. */
+  --color-ground: #141414;
+  --color-raised: #1c1c1c;
+  --color-surface: #262626;
+  --color-ink: #ededed;
+  --color-muted: #a3a3a3;
+  --color-faint: #858585;
+  --color-rule: #333333;
 
   --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -64,32 +46,33 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Keyboard focus stays visible, and takes the ink rather than a brand colour. */
 :focus-visible {
   outline: 2px solid var(--color-ink);
-  outline-offset: 3px;
+  outline-offset: 4px;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: #ededed;
+  color: #141414;
 }
 
 @layer components {
-  /*
-   * Small caps set in the mono, used for anything that labels rather than
-   * reads: years, stack lines, section markers. The letter-spacing is what
-   * makes uppercase legible at this size.
-   */
   .label {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 16px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
     color: var(--color-muted);
   }
 
-  /*
-   * A link that reads as one. No accent colour to lean on, so the underline
-   * does the work — offset far enough to clear the descenders, and thickening
-   * on hover rather than changing hue.
-   */
   .link {
     color: var(--color-ink);
     text-decoration: underline;
@@ -108,38 +91,34 @@ body {
     overscroll-behavior: contain;
   }
 
-  /*
-   * A pill: compact monosapce label in a capsule, used for tabs, viewport
-   * switches, and metadata badges. The pill itself sets no colour — the
-   * caller picks the active state via `bg-ink text-ground` and the rest via
-   * `text-muted`.
-   */
+  /* The caller chooses colour once, including the active state. */
   .pill {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 16px;
-    letter-spacing: 0.02em;
-    border-radius: 9999px;
-    padding: 4px 12px;
-    transition: color 150ms var(--ease-soft);
-  }
-
-  /*
-   * A button in the project-page rail: compact, icon-only, 36×36. The
-   * hover state inverts the colour without changing the background layer.
-   */
-  .rail-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    gap: 0.5rem;
+    min-height: 36px;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    transition: color 150ms var(--ease-soft), background-color 150ms var(--ease-soft);
+  }
+
+  .rail-btn {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
     color: var(--color-muted);
     transition: color 150ms var(--ease-soft), background-color 150ms var(--ease-soft);
   }
   .rail-btn:hover {
-    background-color: var(--color-raised);
+    background-color: var(--color-surface);
     color: var(--color-ink);
   }
 }

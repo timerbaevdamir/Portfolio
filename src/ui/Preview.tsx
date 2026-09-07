@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { cn } from "@/lib/cn"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Globe2, Monitor, Smartphone } from "lucide-react"
 import { useInView } from "@/lib/useInView"
 import { holdScroll } from "@/lib/holdScroll"
 import type { Project, Viewport } from "@/data/projects"
@@ -19,12 +19,8 @@ const SIZES: Record<Viewport, { label: string; width: number; height: number }> 
 /**
  * The stage: a project running at the size of the space it is given.
  *
- * Never scaled. A CSS transform on a frame breaks how the browser rasterises
- * `position: fixed` content inside it — sheets measure and hit-test correctly
- * at full height and paint two thirds of the way down — so the frame here is
- * always 1:1 and the stage scrolls if the device does not fit. A tall
- * phone-shaped card is a phone; a phone with its bottom missing is a broken
- * embed.
+ * Frames render at their logical device size and scale to fit. Their negative
+ * margins return the layout footprint to the size actually painted.
  */
 export function Preview({ project }: { project: Project }) {
   return project.embed === true ? (
@@ -54,28 +50,26 @@ function Window({
 
   return (
     <div className="@container flex h-full min-h-0 flex-col bg-raised">
-      <div className="flex shrink-0 items-center gap-3 border-b border-rule px-3 py-2.5">
+      <div className="flex shrink-0 items-center gap-3 border-b border-rule/70 px-3 py-3">
         <div className="flex shrink-0 items-center gap-1">{controls}</div>
 
-        <span className="label pill hidden flex-1 justify-center truncate bg-ground text-center @min-[560px]:flex">
-          {host}
+        <span className="hidden min-w-0 flex-1 items-center justify-center gap-2 text-sm text-muted @min-[560px]:flex">
+          <Globe2 size={14} className="shrink-0" aria-hidden />
+          <span className="truncate">{host}</span>
         </span>
 
         <a
           href={url}
           target="_blank"
           rel="noreferrer"
-          // The one filled control in view. Everything else on this bar is a
-          // label; this is the way out to the real deployment, so it is the
-          // part that looks pressable. Same pill as the host beside it,
-          // inverted — a button rather than a second badge.
-          className="label pill ml-auto shrink-0 bg-ink text-ground transition-opacity hover:opacity-85 @min-[560px]:ml-0"
+          // The primary action opens the deployment at its own address.
+          className="pill ml-auto shrink-0 bg-ink text-ground hover:bg-white @min-[560px]:ml-0"
         >
           Открыть <ExternalLink size={14} className="inline" />
         </a>
       </div>
 
-      <div className="scroll-area min-h-0 flex-1 overflow-auto bg-raised">
+      <div className="scroll-area min-h-0 flex-1 overflow-auto bg-ground">
         {children}
       </div>
     </div>
@@ -95,7 +89,7 @@ function ViewportSwitch({
     <div
       role="group"
       aria-label="Ширина экрана"
-      className="flex items-center gap-0.5 rounded-full bg-ground p-0.5"
+      className="flex items-center gap-0.5 rounded-full bg-ground p-1"
     >
       {viewports.map((v) => (
         <button
@@ -103,12 +97,15 @@ function ViewportSwitch({
           type="button"
           onClick={() => onChange(v)}
           aria-pressed={v === value}
+          aria-label={SIZES[v].label}
+          title={SIZES[v].label}
           className={cn(
-            "label pill transition-colors",
-            v === value ? "bg-raised text-ink" : "hover:text-ink",
+            "pill px-3",
+            v === value ? "bg-surface text-ink" : "text-muted hover:text-ink",
           )}
         >
-          {SIZES[v].label}
+          {v === "phone" ? <Smartphone size={15} aria-hidden /> : <Monitor size={15} aria-hidden />}
+          <span className="hidden @min-[400px]:inline">{SIZES[v].label}</span>
         </button>
       ))}
     </div>
@@ -193,7 +190,7 @@ function LiveStage({ project }: { project: Project }) {
               // the stage's width, which is the very thing the desktop frame
               // exists to avoid.
               "shrink-0 border-0",
-              isPhone && "rounded-xl border border-rule",
+              isPhone ? "rounded-[28px] ring-1 ring-white/15 shadow-2xl" : "",
             )}
             style={{
               width: frame.width,
@@ -244,8 +241,12 @@ function Cover({ project, note }: { project: Project; note: string }) {
         rel="noreferrer"
         className="flex h-full min-h-full flex-col items-center justify-center gap-3 px-8 text-center"
       >
-        <span className="label">{note}</span>
-        <span className="link font-mono text-lg">Открыть проект <ExternalLink size={14} className="inline" /></span>
+        <span className="flex size-16 items-center justify-center rounded-2xl border border-rule bg-surface text-muted">
+          <Globe2 size={28} aria-hidden />
+        </span>
+        <span className="mt-3 text-2xl font-medium tracking-[-0.03em]">{project.title}</span>
+        <span className="max-w-sm text-base leading-7 text-muted">{note}</span>
+        <span className="pill mt-3 bg-ink text-ground">Открыть проект <ExternalLink size={14} aria-hidden /></span>
       </a>
     </Window>
   )
